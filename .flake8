@@ -1,0 +1,16 @@
+[flake8]
+max-line-length = 80
+exclude =
+    __pycache__,
+	build,
+	.git,
+	.gitlab,
+	tmp,
+	*.egg-info,
+	scripts,
+	*.pyc,
+	data
+	.vscode
+
+select = C,E,F,W,B,B950
+ignore = E501,W503,E203
