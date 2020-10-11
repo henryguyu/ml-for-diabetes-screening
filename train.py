@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def train():
-    X, y, feat_names = data_utils.load_data(cfg.feature_fields["without_FPG"])
+    X, y, feat_names = data_utils.load_data(cfg.feature_fields["with_FPG"])
     X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
 
     # model = LightGBMModel(
@@ -42,14 +42,35 @@ def train():
         },
         feature_len=X_train.shape[1],
     )
-    model.load("data/ann_without.pth")
+    model.load("data/ann_with_FPG.pth")
 
     # model.fit(X_train, y_train, X_test, y_test)
     probs_pred = model.predict(X_test)
-    print(model.precision_recall_curve(y_test, probs_pred))
-    print(model.roc_auc_score(y_test, probs_pred))
+    roc_auc = model.roc_auc_score(y_test, probs_pred)
+    fpr, tpr, _ = model.roc_curve(y_test, probs_pred)
 
-    model.save("data/ann_without.pth")
+    precision, recall, _ = model.precision_recall_curve(y_test, probs_pred)
+
+    import matplotlib.pyplot as plt
+
+    plt.figure()
+    lw = 2
+    plt.plot(
+        fpr, tpr, color="darkorange", lw=lw, label="ROC curve (area = %0.2f)" % roc_auc,
+    )
+    plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("Receiver operating characteristic example")
+    plt.legend(loc="lower right")
+    plt.show()
+
+    print()
+    # print(model.average_precision_score(y_test, probs_pred))
+
+    # model.save("data/ann_with_FPG.pth")
 
 
 if __name__ == "__main__":
