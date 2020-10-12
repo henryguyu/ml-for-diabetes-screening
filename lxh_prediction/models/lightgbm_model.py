@@ -11,8 +11,14 @@ logger = logging.getLogger(__name__)
 
 
 class LightGBMModel(BaseModel):
-    def __init__(self, params: Dict):
-        self.params = params
+    def __init__(self, params: Dict = {}):
+        self.params = {
+            "num_boost_round": 100,
+            "metric": ["auc"],
+            "early_stopping_round": 20,
+            "objective": "binary",
+        }
+        self.params.update(params)
         self.model = None
 
     def fit(

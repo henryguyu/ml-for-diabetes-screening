@@ -16,7 +16,14 @@ logger = logging.getLogger(__name__)
 
 class ANNModel(BaseModel):
     def __init__(self, params: Dict, feature_len=None):
-        self.params = params
+        self.params = {
+            "num_epoch": 60,
+            "lr": 0.00940100736326181,
+            "weight_decay": 0.005,
+            "batch_size": 68,
+            "enable_lr_scheduler": 0,
+        }
+        self.params.update(params)
         self.model = None
         if feature_len is not None:
             self.model = Model(feature_len=feature_len)
@@ -63,10 +70,14 @@ class ANNModel(BaseModel):
         best_state_dict = None
         for epoch in range(params["num_epoch"]):
             train_loss = self._train_one_epoch(model, optimizer, train_loader)
-            logger.info(f"[{epoch}] train_loss: {train_loss}")
-            if valid_loader:
+            if not valid_loader:
+                logger.info(f"[{epoch}] train_loss: {train_loss:.3f}")
+            else:
                 valid_loss, valid_auc = self._valid_one_epoch(model, valid_loader)
-                logger.info(f"[{epoch}] test_loss: {valid_loss}, test_auc: {valid_auc}")
+                logger.info(
+                    f"[{epoch}] train_loss: {train_loss:.3f} "
+                    f"test_loss: {valid_loss:.3f}, test_auc: {valid_auc:.4f}"
+                )
                 if lr_scheduler is not None:
                     lr_scheduler.step(valid_auc)
                 if best_auc is None or valid_auc > best_auc:
