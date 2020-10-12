@@ -1,0 +1,20 @@
+authorName: longc
+experimentName: LighGBM Parameter Search
+trialConcurrency: 1
+maxExecDuration: 2d
+maxTrialNum: 400
+#choice: local, remote, pai
+trainingServicePlatform: local
+searchSpacePath: search_space.json
+#choice: true, false
+useAnnotation: false
+tuner:
+  #choice: TPE, Random, Anneal, Evolution, BatchTuner, MetisTuner
+  #SMAC (SMAC should be installed through nnictl)
+  builtinTunerName: TPE
+  classArgs:
+    #choice: maximize, minimize
+    optimize_mode: maximize
+trial:
+  command: python run.py
+  codeDir: .
