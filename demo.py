@@ -52,6 +52,9 @@ def train():
 
     # model = LogisticRegressionModel({"solver": "saga", "max_iter": 1000})
 
+    cv_aucs = model.cross_validate(X, y, metric_fn=LightGBMModel.roc_auc_score)
+    print(cv_aucs)
+
     model.fit(X_train, y_train, X_test, y_test)
     probs_pred = model.predict(X_test)
     print(probs_pred)

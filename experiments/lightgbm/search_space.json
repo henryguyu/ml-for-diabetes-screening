@@ -3,7 +3,6 @@
         "_type": "choice",
         "_value": [
             "gbdt",
-            "random_forest",
             "dart",
             "goss"
         ]
@@ -103,6 +102,16 @@
             16,
             32,
             64
+        ]
+    },
+    "path_smooth": {
+        "_type": "choice",
+        "_value": [
+            0,
+            0.0001,
+            0.001,
+            0.01,
+            0.1
         ]
     }
 }

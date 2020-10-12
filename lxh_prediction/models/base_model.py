@@ -1,5 +1,8 @@
+from typing import Callable
 import numpy as np
 from sklearn import metrics
+
+from lxh_prediction.data_utils import split_cross_validation
 
 
 class BaseModel:
@@ -20,6 +23,22 @@ class BaseModel:
 
     def load(self, path: str):
         raise NotImplementedError
+
+    def cross_validate(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        metric_fn: Callable[[np.ndarray, np.ndarray], float],
+        n_folds=5,
+    ):
+        metrics = []
+        for X_train, y_train, X_test, y_test in split_cross_validation(
+            X, y, n_folds=n_folds
+        ):
+            self.fit(X_train, y_train, X_test, y_test)
+            probs_pred = self.predict(X_test)
+            metrics.append(metric_fn(y_test, probs_pred))
+        return metrics
 
     @staticmethod
     def precision_recall_curve(y_gt, probs_pred, *args, **kwargs):
