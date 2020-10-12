@@ -1,7 +1,12 @@
 import logging
 
 import lxh_prediction.config as cfg
-from lxh_prediction.models import BaseModel, LightGBMModel, ANNModel
+from lxh_prediction.models import (
+    BaseModel,
+    LightGBMModel,
+    ANNModel,
+    LogisticRegressionModel,
+)
 from lxh_prediction import data_utils
 
 
@@ -9,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def train():
-    X, y, feat_names = data_utils.load_data(cfg.feature_fields["with_FPG"])
+    X, y, feat_names = data_utils.load_data(cfg.feature_fields["without_FPG"])
     X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
 
     # model = LightGBMModel(
@@ -32,20 +37,24 @@ def train():
     #     }
     # )
 
-    model = ANNModel(
-        {
-            "lr": 1e-2,
-            "weight_decay": 0.001,
-            "batch_size": 256,
-            "enable_lr_scheduler": True,
-            "num_epoch": 40,
-        },
-        feature_len=X_train.shape[1],
-    )
-    model.load("data/ann_with_FPG.pth")
+    # model = ANNModel(
+    #     {
+    #         "lr": 1e-2,
+    #         "weight_decay": 0.001,
+    #         "batch_size": 256,
+    #         "enable_lr_scheduler": True,
+    #         "num_epoch": 40,
+    #     },
+    #     feature_len=X_train.shape[1],
+    # )
+    # model.load("data/ann_with_FPG.pth")
 
-    # model.fit(X_train, y_train, X_test, y_test)
+    model = LogisticRegressionModel({"solver": "saga", "max_iter": 1000})
+
+    model.fit(X_train, y_train, X_test, y_test)
     probs_pred = model.predict(X_test)
+    print(probs_pred)
+
     roc_auc = model.roc_auc_score(y_test, probs_pred)
     fpr, tpr, _ = model.roc_curve(y_test, probs_pred)
 
