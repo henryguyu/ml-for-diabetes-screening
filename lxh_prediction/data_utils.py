@@ -49,9 +49,10 @@ def split_data(X: np.ndarray, y: np.ndarray = None, train_ratio=0.8, seed=1063):
     return X_train, y[train_indices], X_test, y[test_indices]
 
 
-def split_cross_validation(X: np.ndarray, y: np.ndarray, n_folds: int = 5):
+def split_cross_validation(X: np.ndarray, y: np.ndarray, n_folds: int = 5, seed=1063):
+    np.random.seed(seed)
+    indices = np.random.permutation(len(X)).tolist()
     num = len(X) // n_folds
-    indices = list(range(len(X)))
     for i in range(n_folds):
         valid_indices = indices[i * num : (i + 1) * num]
         train_indices = indices[0 : i * num] + indices[(i + 1) * num :]
