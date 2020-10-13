@@ -30,5 +30,51 @@
             0,
             1
         ]
+    },
+    "opt": {
+        "_type": "choice",
+        "_value": [
+            "Adam",
+            "SGD",
+            "RMSprop"
+        ]
+    },
+    "n_channels": {
+        "_type": "randint",
+        "_value": [
+            64,
+            512
+        ]
+    },
+    "n_layers": {
+        "_type": "randint",
+        "_value": [
+            3,
+            8
+        ]
+    },
+    "dropout": {
+        "_type": "choice",
+        "_value": [
+            0,
+            1
+        ]
+    },
+    "activate": {
+        "_type": "choice",
+        "_value": [
+            "ReLU",
+            "Sigmoid",
+            "LeakyReLU",
+            "Tanh"
+        ]
+    },
+    "branches": {
+        "_type": "choice",
+        "_value": [
+            [1],
+            [1, 0],
+            [2, 1]
+        ]
     }
 }

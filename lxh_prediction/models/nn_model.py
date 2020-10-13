@@ -62,11 +62,21 @@ class Cell(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, feature_len, n_channels=256, n_layers=6):
+    def __init__(self, feature_len, n_channels=256, n_layers=6, params={}):
         super().__init__()
         modules = [Cell(feature_len, n_channels)]
         for i in range(1, n_layers):
-            modules.append(Cell(n_channels, n_channels))
+            dropout = params.get("dropout", False) and i == n_layers - 1
+            modules.append(
+                Cell(
+                    n_channels,
+                    n_channels,
+                    activate=params.get("activate", "ReLU"),
+                    bn=params.get("bn", True),
+                    dropout=dropout,
+                    branches=params.get("branches", (1,)),
+                )
+            )
         self.fcs = nn.Sequential(*modules)
         self.classifier = nn.Linear(n_channels, 2)
 

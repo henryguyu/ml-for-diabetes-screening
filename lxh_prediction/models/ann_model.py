@@ -15,6 +15,24 @@ from .base_model import BaseModel
 logger = logging.getLogger(__name__)
 
 
+def get_optimizer(model, opt_name, lr, weight_decay):
+    if opt_name == "Adam":
+        optimizer = torch.optim.Adam(
+            model.parameters(), lr=lr, weight_decay=weight_decay
+        )
+    elif opt_name == "SGD":
+        optimizer = torch.optim.SGD(
+            model.parameters(), lr=lr, momentum=0.9, weight_decay=weight_decay
+        )
+    elif opt_name == "RMSprop":
+        optimizer = torch.optim.RMSprop(
+            model.parameters(), lr=lr, weight_decay=weight_decay
+        )
+    else:
+        raise ValueError(opt_name)
+    return optimizer
+
+
 class ANNModel(BaseModel):
     def __init__(self, params: Dict, feature_len=None):
         self.params = {
@@ -23,11 +41,19 @@ class ANNModel(BaseModel):
             "weight_decay": 0.005,
             "batch_size": 68,
             "enable_lr_scheduler": 0,
+            "opt": "Adam",
+            "n_channels": 256,
+            "n_layers": 6,
         }
         self.params.update(params)
         self.model = None
         if feature_len is not None:
-            self.model = Model(feature_len=feature_len)
+            self.model = Model(
+                feature_len=feature_len,
+                n_channels=self.params["n_channels"],
+                n_layers=self.params["n_layers"],
+                params=self.params,
+            )
 
     def fit(
         self,
@@ -41,12 +67,16 @@ class ANNModel(BaseModel):
         model = Model(feature_len=X.shape[1])
         if use_gpu:
             model = model.cuda()
-        optimizer = torch.optim.Adam(
-            model.parameters(), lr=params["lr"], weight_decay=params["weight_decay"],
+
+        optimizer = get_optimizer(
+            model, params["opt"], params["lr"], params["weight_decay"]
         )
         lr_scheduler = (
-            torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max")
-            if self.params["enable_lr_scheduler"]
+            # torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max")
+            torch.optim.lr_scheduler.CosineAnnealingLR(
+                optimizer, params["num_epoch"], eta_min=0.0001
+            )
+            if params["enable_lr_scheduler"]
             else None
         )
 
@@ -71,6 +101,8 @@ class ANNModel(BaseModel):
         best_state_dict = None
         for epoch in range(params["num_epoch"]):
             train_loss = self._train_one_epoch(model, optimizer, train_loader)
+            if lr_scheduler is not None:
+                lr_scheduler.step(epoch)
             if not valid_loader:
                 logger.info(f"[{epoch}] train_loss: {train_loss:.3f}")
             else:
@@ -79,8 +111,8 @@ class ANNModel(BaseModel):
                     f"[{epoch}] train_loss: {train_loss:.3f} "
                     f"test_loss: {valid_loss:.3f}, test_auc: {valid_auc:.4f}"
                 )
-                if lr_scheduler is not None:
-                    lr_scheduler.step(valid_auc)
+                # if lr_scheduler is not None:
+                #     lr_scheduler.step(valid_auc)
                 if best_auc is None or valid_auc > best_auc:
                     best_epoch = epoch
                     best_auc = valid_auc
