@@ -8,7 +8,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from .nn_utils import Model, Dataset
+from .nn_utils import Dataset
+from .nn_model import Model
 from .base_model import BaseModel
 
 logger = logging.getLogger(__name__)
