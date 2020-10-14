@@ -1,6 +1,6 @@
 authorName: longc
-experimentName: LighGBM Parameter Search
-trialConcurrency: 1
+experimentName: ANN Parameter Search
+trialConcurrency: 4
 maxExecDuration: 2d
 maxTrialNum: 400
 #choice: local, remote, pai
@@ -14,6 +14,7 @@ tuner:
   builtinTunerName: TPE
   classArgs:
     #choice: maximize, minimize
+    parallel_optimize: True
     optimize_mode: maximize
 # assessor:
 #   builtinAssessorName: Medianstop

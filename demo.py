@@ -38,11 +38,16 @@ def train():
 
     model = ANNModel(
         {
-            "lr": 0.00940100736326181,
-            "weight_decay": 0.005,
-            "batch_size": 68,
+            "lr": 0.015596326148781257,
+            "weight_decay": 0.001,
+            "batch_size": 26,
             "enable_lr_scheduler": 0,
-            "num_epoch": 60,
+            "opt": "Adam",
+            "n_channels": 154,
+            "n_layers": 5,
+            "dropout": 0,
+            "activate": "ReLU",
+            "branches": [2, 1],
         },
         feature_len=X_train.shape[1],
     )
