@@ -2,7 +2,7 @@ import logging
 import pickle as pk
 from typing import Dict
 
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 import numpy as np
 
 from .base_model import BaseModel
@@ -10,7 +10,7 @@ from .base_model import BaseModel
 logger = logging.getLogger(__name__)
 
 
-class LogisticRegressionModel(BaseModel):
+class SVMModel(BaseModel):
     def __init__(self, params: Dict = {}):
         self.params = params
         self.model = None
@@ -22,13 +22,17 @@ class LogisticRegressionModel(BaseModel):
         X_valid: np.ndarray = None,
         y_valid: np.ndarray = None,
     ):
-        logger.info("Start LogisticRegression fit...")
-        self.model = LogisticRegression(**self.params).fit(X, y)
-        logger.info("End LogisticRegression fit")
+        logger.info("Start SVC fit...")
+        self.model = SVC(**self.params).fit(X, y)
+        logger.info("End SVC fit")
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         assert self.model is not None
         return self.model.predict(X)
+
+    def feature_importance(self):
+        assert self.model is not None
+        return np.copy(self.model.coef_).reshape(-1)
 
     def save(self, path):
         with open(path, "wb") as f:

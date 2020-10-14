@@ -21,6 +21,9 @@ class BaseModel:
     def predict(self, X: np.ndarray) -> np.ndarray:
         raise NotImplementedError
 
+    def feature_importance(self):
+        raise NotImplementedError
+
     def save(self, path: str):
         raise NotImplementedError
 

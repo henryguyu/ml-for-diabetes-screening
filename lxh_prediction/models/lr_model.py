@@ -2,7 +2,7 @@ import logging
 import pickle as pk
 from typing import Dict
 
-import lightgbm as lgb
+from sklearn.linear_model import LogisticRegression
 import numpy as np
 
 from .base_model import BaseModel
@@ -10,15 +10,9 @@ from .base_model import BaseModel
 logger = logging.getLogger(__name__)
 
 
-class LightGBMModel(BaseModel):
+class LogisticRegressionModel(BaseModel):
     def __init__(self, params: Dict = {}):
-        self.params = {
-            "num_boost_round": 100,
-            "metric": ["auc"],
-            "early_stopping_round": 20,
-            "objective": "binary",
-        }
-        self.params.update(params)
+        self.params = params
         self.model = None
 
     def fit(
@@ -28,14 +22,9 @@ class LightGBMModel(BaseModel):
         X_valid: np.ndarray = None,
         y_valid: np.ndarray = None,
     ):
-        train_data = lgb.Dataset(X, label=y)
-        valid_sets = [train_data]
-        if X_valid is not None:
-            valid_sets.append(lgb.Dataset(X_valid, label=y_valid))
-
-        logger.info("Start lgb.train...")
-        self.model = lgb.train(self.params, train_data, valid_sets=valid_sets)
-        logger.info("lgb.train completed!")
+        logger.info("Start LogisticRegression fit...")
+        self.model = LogisticRegression(**self.params).fit(X, y)
+        logger.info("End LogisticRegression fit")
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         assert self.model is not None
@@ -43,7 +32,7 @@ class LightGBMModel(BaseModel):
 
     def feature_importance(self):
         assert self.model is not None
-        return self.model.feature_importance()
+        return np.copy(self.model.coef_).reshape(-1)
 
     def save(self, path):
         with open(path, "wb") as f:

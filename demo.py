@@ -2,12 +2,7 @@ import logging
 import numpy as np
 
 import lxh_prediction.config as cfg
-from lxh_prediction.models import (
-    BaseModel,
-    LightGBMModel,
-    ANNModel,
-    LogisticRegressionModel,
-)
+from lxh_prediction import models
 from lxh_prediction import data_utils
 from lxh_prediction.plot import plot_curve
 
@@ -16,10 +11,12 @@ logging.basicConfig(level=logging.INFO)
 
 
 def train():
-    X, y, feat_names = data_utils.load_data(cfg.feature_fields["without_FPG"])
+    X, y, feat_names = data_utils.load_data(
+        cfg.feature_fields["without_FPG"], onehot_fields=[]
+    )
     X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
 
-    # model = LightGBMModel(
+    # model = models.LightGBMModel(
     #     {
     #         "boosting": "gbdt",
     #         "num_leaves": 18,
@@ -36,21 +33,25 @@ def train():
     #     }
     # )
 
-    model = ANNModel(
-        {
-            "lr": 0.015596326148781257,
-            "weight_decay": 0.001,
-            "batch_size": 26,
-            "enable_lr_scheduler": 0,
-            "opt": "Adam",
-            "n_channels": 154,
-            "n_layers": 5,
-            "dropout": 0,
-            "activate": "ReLU",
-            "branches": [2, 1],
-        },
-        feature_len=X_train.shape[1],
-    )
+    # model = ANNModel(
+    #     {
+    #         "lr": 0.015596326148781257,
+    #         "weight_decay": 0.001,
+    #         "batch_size": 26,
+    #         "enable_lr_scheduler": 0,
+    #         "opt": "Adam",
+    #         "n_channels": 154,
+    #         "n_layers": 5,
+    #         "dropout": 0,
+    #         "activate": "ReLU",
+    #         "branches": [2, 1],
+    #     },
+    #     feature_len=X_train.shape[1],
+    # )
+
+    # model = models.SVMModel({"kernel": "linear"})
+    model = models.LogisticRegressionModel()
+
     # model.load("data/ann_with_FPG.pth")
 
     # model = LogisticRegressionModel({"solver": "saga", "max_iter": 1000})
@@ -60,13 +61,14 @@ def train():
 
     model.fit(X_train, y_train, X_test, y_test)
 
-    # # feat importance
-    # feat_importances = list(zip(feat_names, model.model.feature_importance()))
-    # feat_importances = sorted(feat_importances, key=lambda x: -x[1])
-    # print(feat_importances)
+    # feat importance
+    feat_importances = list(zip(feat_names, model.feature_importance()))
+    feat_importances = sorted(feat_importances, key=lambda x: -x[1])
+    print(feat_importances)
 
     probs_pred = model.predict(X_test)
     print(y_test.mean())
+    print(np.mean((probs_pred > 0) & y_test))
 
     roc_auc = model.roc_auc_score(y_test, probs_pred)
     fpr, tpr, _ = model.roc_curve(y_test, probs_pred)
