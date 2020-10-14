@@ -14,7 +14,7 @@ def read_csv(filename, check_nan=True) -> pd.DataFrame:
 def onehotify(df: pd.DataFrame, colname, rm_origin=True):
     onehots = pd.get_dummies(df[colname].astype(int), prefix=colname)
     if rm_origin:
-        df.drop(columns=colname)
+        df = df.drop(columns=colname)
     return pd.concat([df, onehots], axis=1)
 
 
@@ -25,6 +25,10 @@ def load_data(
     label_field=cfg.label_field,
 ):
     df = read_csv(filename)
+    if not feature_fields:
+        feature_fields = list(df.columns)
+        feature_fields.remove(label_field)
+
     y = df[label_field].to_numpy(dtype=int, copy=True)
     X = df[feature_fields]
     for name in onehot_fields:
