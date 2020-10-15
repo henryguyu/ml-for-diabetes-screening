@@ -25,7 +25,7 @@ class ADAModel(BaseModel):
 
     def predict(self, X: np.ndarray, feat_names) -> np.ndarray:
         df = pd.DataFrame(X, columns=feat_names)
-        scores = np.zeros([len(df), 7], dtype=float)
+
         # agescore
         df.loc[(df["age"] >= 40) & (df["age"] <= 49), "agescore"] = 1
         df.loc[(df["age"] >= 50) & (df["age"] <= 59), "agescore"] = 2

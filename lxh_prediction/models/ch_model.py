@@ -25,7 +25,7 @@ class CHModel(BaseModel):
 
     def predict(self, X: np.ndarray, feat_names) -> np.ndarray:
         df = pd.DataFrame(X, columns=feat_names)
-        scores = np.zeros([len(df), 7], dtype=float)
+
         # agescore
         df["Cagescore"] = 0
         df.loc[(df["age"] >= 25) & (df["age"] <= 34), "Cagescore"] = 4
