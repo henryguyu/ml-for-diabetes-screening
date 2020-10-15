@@ -45,7 +45,7 @@ class ADAModel(BaseModel):
         df["BMIscore"] = 0
         df.loc[(df["BMI"] >= 25) & (df["BMI"] <= 29.9), "BMIscore"] = 1
         df.loc[(df["BMI"] >= 30) & (df["BMI"] < 39.9), "BMIscore"] = 2
-        df.loc[df["BMI"] >= 39.9, "BMIscore"] = 2
+        df.loc[df["BMI"] >= 39.9, "BMIscore"] = 3
 
         scores = df[
             [
