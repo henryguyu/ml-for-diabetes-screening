@@ -23,6 +23,7 @@ def load_data(
     filename=cfg.data_file,
     onehot_fields=cfg.onehot_fields,
     label_field=cfg.label_field,
+    extra_fields=[],
 ):
     df = read_csv(filename)
     if not feature_fields:
@@ -36,7 +37,11 @@ def load_data(
             X = onehotify(X, name, rm_origin=True)
     feat_names = list(X.columns)
     X = X.to_numpy(dtype=float, copy=True)
-    return X, y, feat_names
+    if not extra_fields:
+        return X, y, feat_names
+
+    extra_data = df[extra_fields].to_numpy(dtype=float, copy=True)
+    return X, y, feat_names, extra_data
 
 
 def split_data(X: np.ndarray, y: np.ndarray = None, train_ratio=0.8, seed=1063):
@@ -61,5 +66,7 @@ def split_cross_validation(X: np.ndarray, y: np.ndarray, n_folds: int = 5, seed=
         start = i * num
         end = (i + 1) * num if i + 1 < n_folds else None
         valid_indices = indices[start:end]
-        train_indices = indices[0:start] + indices[end:]
-        yield X[train_indices], y[train_indices], X[valid_indices], y[valid_indices]
+        train_indices = indices[0:start] + (indices[end:] if end is not None else [])
+        yield X[train_indices], y[train_indices], X[valid_indices], y[
+            valid_indices
+        ], train_indices, valid_indices

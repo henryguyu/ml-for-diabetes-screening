@@ -16,7 +16,7 @@ def train(params):
 
     params.update({"num_epoch": 60},)
     model = ANNModel(params)
-    rocs, y_gt, probs_pred = model.cross_validate(X, y, metric_utils.roc_auc_score)
+    rocs = model.cross_validate(X, y, metric_utils.roc_auc_score)[0]
     return np.mean(rocs)
 
 

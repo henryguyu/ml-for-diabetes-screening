@@ -12,7 +12,9 @@ logging.basicConfig(level=logging.INFO)
 
 
 def train():
-    X, y, feat_names = data_utils.load_data(cfg.feature_fields["without_FPG"])
+    X, y, feat_names, FPG = data_utils.load_data(
+        cfg.feature_fields["without_FPG"], extra_fields="FPG"
+    )
     # X, y, feat_names = data_utils.load_data(
     #     None, filename="data/pca_with_FPG.csv", onehot_fields=[]
     # )
@@ -66,29 +68,44 @@ def train():
     # except NotImplementedError:
     #     pass
 
-    cv_aucs, cv_y_test, cv_probs_pred = model.cross_validate(
+    cv_aucs, cv_probs_pred, cv_indices = model.cross_validate(
         X, y, metric_fn=metric_utils.roc_auc_score
     )
     print(cv_aucs, np.mean(cv_aucs))
-    y_test, probs_pred = cv_y_test[0], cv_probs_pred[0]
+    probs_pred, indices = cv_probs_pred[0], cv_indices[0]
+    y_test = y[indices]
 
-    nag_rate, miss_rate, _ = metric_utils.nag_miss_curve(y_test, probs_pred)
-    plot_curve(
-        miss_rate,
-        nag_rate,
-        xlabel="Prediction miss rate",
-        ylabel="Patients avoiding examination",
-        # subline=((0, 1), (0, 1)),
-    )
+    # costs, miss_rate, _ = metric_utils.cost_curve_without_FPG(y_test, probs_pred)
 
-    precision, recall, _ = metric_utils.precision_recall_curve(y_test, probs_pred)
-    plot_curve(
-        recall,
-        precision,
-        xlabel="Reccall",
-        ylabel="Precision",
-        # subline=((0, 1), (0, 1)),
-    )
+    # FPG_test = FPG[indices]
+    # costs, miss_rate, _ = metric_utils.cost_curve_with_FPG(y_test, probs_pred, FPG_test)
+
+    # plot_curve(
+    #     miss_rate,
+    #     costs,
+    #     ylim=[0, 70],
+    #     xlabel="Prediction miss rate",
+    #     ylabel="Cost",
+    #     # subline=((0, 1), (0, 1)),
+    # )
+
+    # nag_rate, miss_rate, _ = metric_utils.nag_miss_curve(y_test, probs_pred)
+    # plot_curve(
+    #     miss_rate,
+    #     nag_rate,
+    #     xlabel="Prediction miss rate",
+    #     ylabel="Patients avoiding examination",
+    #     # subline=((0, 1), (0, 1)),
+    # )
+
+    # precision, recall, _ = metric_utils.precision_recall_curve(y_test, probs_pred)
+    # plot_curve(
+    #     recall,
+    #     precision,
+    #     xlabel="Reccall",
+    #     ylabel="Precision",
+    #     # subline=((0, 1), (0, 1)),
+    # )
 
     roc_auc = metric_utils.roc_auc_score(y_test, probs_pred)
     fpr, tpr, _ = metric_utils.roc_curve(y_test, probs_pred)

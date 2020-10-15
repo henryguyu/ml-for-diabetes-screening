@@ -24,7 +24,7 @@ def train(params):
     )
     model = LightGBMModel(params)
     # model.fit(X_train, y_train, X_test, y_test)
-    rocs, y_gt, probs_pred = model.cross_validate(X, y, model.roc_auc_score)
+    rocs = model.cross_validate(X, y, model.roc_auc_score)[0]
 
     # probs_pred = model.predict(X_test)
     # roc_auc = model.roc_auc_score(y_test, probs_pred)
