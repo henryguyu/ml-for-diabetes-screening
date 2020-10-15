@@ -3,7 +3,7 @@ import pickle as pk
 from typing import Dict
 
 from sklearn.decomposition import KernelPCA
-import numpy as np
+import pandas as pd
 
 from .base_model import BaseModel
 
@@ -17,18 +17,23 @@ class PCAModel(BaseModel):
 
     def fit(
         self,
-        X: np.ndarray,
-        y: np.ndarray,
-        X_valid: np.ndarray = None,
-        y_valid: np.ndarray = None,
+        X: pd.DataFrame,
+        y: pd.DataFrame,
+        X_valid: pd.DataFrame = None,
+        y_valid: pd.DataFrame = None,
     ):
         logger.info("Start KernelPCA fit...")
-        self.model = KernelPCA(**self.params).fit(X, y)
+        self.model = KernelPCA(**self.params).fit(X.to_numpy(), y.to_numpy())
         logger.info("End KernelPCA fit")
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         assert self.model is not None
-        return self.model.transform(X)
+        probs_pred = self.model.transform(X)
+        return pd.DataFrame(
+            probs_pred,
+            index=X.index,
+            columns=[f"pca_feat_{i}" for i in range(probs_pred.shape[1])],
+        )
 
     def save(self, path):
         with open(path, "wb") as f:

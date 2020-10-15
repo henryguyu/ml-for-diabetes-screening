@@ -23,42 +23,39 @@ def load_data(
     filename=cfg.data_file,
     onehot_fields=cfg.onehot_fields,
     label_field=cfg.label_field,
-    extra_fields=[],
 ):
     df = read_csv(filename)
     if not feature_fields:
         feature_fields = list(df.columns)
         feature_fields.remove(label_field)
 
-    y = df[label_field].to_numpy(dtype=int, copy=True)
-    X = df[feature_fields]
+    y = df[label_field].copy()
+    X = df[feature_fields].copy()
     for name in onehot_fields:
         if name in X:
             X = onehotify(X, name, rm_origin=True)
-    feat_names = list(X.columns)
-    X = X.to_numpy(dtype=float, copy=True)
-    if not extra_fields:
-        return X, y, feat_names
-
-    extra_data = df[extra_fields].to_numpy(dtype=float, copy=True)
-    return X, y, feat_names, extra_data
+    return X, y
 
 
-def split_data(X: np.ndarray, y: np.ndarray = None, train_ratio=0.8, seed=1063):
+def split_data(X: pd.DataFrame, y: pd.DataFrame = None, train_ratio=0.8, seed=1063):
     np.random.seed(seed)
     indices = np.random.permutation(len(X))
     num_trains = int(len(indices) * train_ratio)
     train_indices = indices[:num_trains]
     test_indices = indices[num_trains:]
 
-    X_train = X[train_indices]
-    X_test = X[test_indices]
+    X_train = X.iloc[train_indices].copy()
+    X_test = X.iloc[test_indices].copy()
     if y is None:
         return X_train, X_test
-    return X_train, y[train_indices], X_test, y[test_indices]
+    y_train = y.iloc[train_indices].copy()
+    y_test = y.iloc[test_indices].copy()
+    return X_train, y_train, X_test, y_test
 
 
-def split_cross_validation(X: np.ndarray, y: np.ndarray, n_folds: int = 5, seed=1063):
+def split_cross_validation(
+    X: pd.DataFrame, y: pd.DataFrame, n_folds: int = 5, seed=1063
+):
     np.random.seed(seed)
     indices = np.random.permutation(len(X)).tolist()
     num = len(X) // n_folds
@@ -67,6 +64,8 @@ def split_cross_validation(X: np.ndarray, y: np.ndarray, n_folds: int = 5, seed=
         end = (i + 1) * num if i + 1 < n_folds else None
         valid_indices = indices[start:end]
         train_indices = indices[0:start] + (indices[end:] if end is not None else [])
-        yield X[train_indices], y[train_indices], X[valid_indices], y[
-            valid_indices
-        ], train_indices, valid_indices
+        X_train = X.iloc[train_indices].copy()
+        y_train = y.iloc[train_indices].copy()
+        X_valid = X.iloc[valid_indices].copy()
+        y_valid = y.iloc[valid_indices].copy()
+        yield X_train, y_train, X_valid, y_valid

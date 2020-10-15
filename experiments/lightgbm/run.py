@@ -5,13 +5,14 @@ import numpy as np
 import lxh_prediction.config as cfg
 from lxh_prediction.models import LightGBMModel
 from lxh_prediction import data_utils
+from lxh_prediction import metric_utils
 
 
 logging.basicConfig(level=logging.INFO)
 
 
 def train(params):
-    X, y, feat_names = data_utils.load_data(cfg.feature_fields["without_FPG"])
+    X, y = data_utils.load_data(cfg.feature_fields["without_FPG"])
     # X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
 
     params.update(
@@ -24,7 +25,7 @@ def train(params):
     )
     model = LightGBMModel(params)
     # model.fit(X_train, y_train, X_test, y_test)
-    rocs = model.cross_validate(X, y, model.roc_auc_score)[0]
+    rocs = model.cross_validate(X, y, metric_utils.roc_auc_score)[0]
 
     # probs_pred = model.predict(X_test)
     # roc_auc = model.roc_auc_score(y_test, probs_pred)

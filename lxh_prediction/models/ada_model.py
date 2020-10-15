@@ -1,7 +1,6 @@
 import logging
 from typing import Dict
 
-import numpy as np
 import pandas as pd
 
 from .base_model import BaseModel
@@ -16,15 +15,15 @@ class ADAModel(BaseModel):
 
     def fit(
         self,
-        X: np.ndarray,
-        y: np.ndarray,
-        X_valid: np.ndarray = None,
-        y_valid: np.ndarray = None,
+        X: pd.DataFrame,
+        y: pd.DataFrame,
+        X_valid: pd.DataFrame = None,
+        y_valid: pd.DataFrame = None,
     ):
         pass
 
-    def predict(self, X: np.ndarray, feat_names) -> np.ndarray:
-        df = pd.DataFrame(X, columns=feat_names)
+    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
+        df = X
 
         # agescore
         df.loc[(df["age"] >= 40) & (df["age"] <= 49), "agescore"] = 1
@@ -58,4 +57,4 @@ class ADAModel(BaseModel):
                 "BMIscore",
             ]
         ]
-        return (scores.sum(1) >= 5).to_numpy(dtype=int)
+        return (scores.sum(1) >= 5).astype(int)

@@ -4,6 +4,7 @@ from typing import Dict
 
 from sklearn.svm import SVC
 import numpy as np
+import pandas as pd
 
 from .base_model import BaseModel
 
@@ -17,18 +18,19 @@ class SVMModel(BaseModel):
 
     def fit(
         self,
-        X: np.ndarray,
-        y: np.ndarray,
-        X_valid: np.ndarray = None,
-        y_valid: np.ndarray = None,
+        X: pd.DataFrame,
+        y: pd.DataFrame,
+        X_valid: pd.DataFrame = None,
+        y_valid: pd.DataFrame = None,
     ):
         logger.info("Start SVC fit...")
-        self.model = SVC(**self.params).fit(X, y)
+        self.model = SVC(**self.params).fit(X.to_numpy(), y.to_numpy())
         logger.info("End SVC fit")
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         assert self.model is not None
-        return self.model.predict(X)
+        probs_pred = self.model.predict(X.to_numpy())
+        return pd.DataFrame(probs_pred, index=X.index, columns=["probs_pred"])
 
     def feature_importance(self):
         assert self.model is not None

@@ -2,8 +2,7 @@ import logging
 from typing import Dict
 from copy import deepcopy
 
-import numpy as np
-from sklearn import metrics
+import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -11,8 +10,10 @@ from torch.utils.data import DataLoader
 from .nn_utils import Dataset
 from .nn_model import Model
 from .base_model import BaseModel
+from lxh_prediction import metric_utils
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def get_optimizer(model, opt_name, lr, weight_decay):
@@ -37,13 +38,16 @@ class ANNModel(BaseModel):
     def __init__(self, params: Dict, feature_len=None):
         self.params = {
             "num_epoch": 60,
-            "lr": 0.00940100736326181,
-            "weight_decay": 0.005,
-            "batch_size": 68,
+            "lr": 0.04150735339940105,
+            "weight_decay": 0.0005,
+            "batch_size": 251,
             "enable_lr_scheduler": 0,
             "opt": "Adam",
-            "n_channels": 256,
-            "n_layers": 6,
+            "n_channels": 428,
+            "n_layers": 5,
+            "dropout": 1,
+            "activate": "Tanh",
+            "branches": [1],
         }
         self.params.update(params)
         self.model = None
@@ -57,12 +61,17 @@ class ANNModel(BaseModel):
 
     def fit(
         self,
-        X: np.ndarray,
-        y: np.ndarray,
-        X_valid: np.ndarray = None,
-        y_valid: np.ndarray = None,
+        X: pd.DataFrame,
+        y: pd.DataFrame,
+        X_valid: pd.DataFrame = None,
+        y_valid: pd.DataFrame = None,
         use_gpu=torch.cuda.is_available(),
     ):
+        X = X.to_numpy().copy()
+        y = y.to_numpy().copy()
+        if X_valid is not None:
+            X_valid = X_valid.to_numpy().copy()
+            y_valid = y_valid.to_numpy().copy()
         params = self.params
         model = Model(feature_len=X.shape[1])
         if use_gpu:
@@ -150,7 +159,7 @@ class ANNModel(BaseModel):
         loss = nn.functional.cross_entropy(pred_logits, y_gt)
 
         probs_pred = torch.softmax(pred_logits, dim=1).data.cpu().numpy()[:, 1]
-        auc = metrics.roc_auc_score(
+        auc = metric_utils.roc_auc_score(
             y_gt.data.cpu().numpy(), probs_pred, average="macro"
         )
         return loss.item(), auc
@@ -170,16 +179,17 @@ class ANNModel(BaseModel):
                 targets.append(y.data)
         return torch.cat(pred_logits), torch.cat(targets)
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         assert self.model is not None
         dataloader = torch.utils.data.DataLoader(
-            Dataset(X,),
+            Dataset(X.to_numpy(float)),
             batch_size=self.params["batch_size"],
             shuffle=False,
             num_workers=1,
         )
         pred_logits, _ = self._predict_on_dataloader(self.model, dataloader)
         probs_pred = torch.softmax(pred_logits, dim=1).data.cpu().numpy()[:, 1]
+        probs_pred = pd.DataFrame(probs_pred, index=X.index, columns=["probs_pred"])
         return probs_pred
 
     def save(self, path):

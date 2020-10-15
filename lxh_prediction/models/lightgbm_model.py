@@ -3,7 +3,7 @@ import pickle as pk
 from typing import Dict
 
 import lightgbm as lgb
-import numpy as np
+import pandas as pd
 
 from .base_model import BaseModel
 
@@ -18,29 +18,41 @@ class LightGBMModel(BaseModel):
             "metric": ["auc"],
             "early_stopping_round": 20,
             "objective": "binary",
+            "num_leaves": 16,
+            "max_bin": 162,
+            "max_depth": 256,
+            "learning_rate": 0.028753305217484978,
+            "lambda_l1": 0.1,
+            "lambda_l2": 0.001,
+            "feature_fraction": 0.7,
+            "min_data_in_bin": 5,
+            "bagging_fraction": 0.5,
+            "bagging_freq": 4,
+            "path_smooth": 0.01,
         }
         self.params.update(params)
         self.model = None
 
     def fit(
         self,
-        X: np.ndarray,
-        y: np.ndarray,
-        X_valid: np.ndarray = None,
-        y_valid: np.ndarray = None,
+        X: pd.DataFrame,
+        y: pd.DataFrame,
+        X_valid: pd.DataFrame = None,
+        y_valid: pd.DataFrame = None,
     ):
-        train_data = lgb.Dataset(X, label=y)
+        train_data = lgb.Dataset(X.to_numpy(), label=y.to_numpy())
         valid_sets = [train_data]
         if X_valid is not None:
-            valid_sets.append(lgb.Dataset(X_valid, label=y_valid))
+            valid_sets.append(lgb.Dataset(X_valid.to_numpy(), label=y_valid.to_numpy()))
 
         logger.info("Start lgb.train...")
         self.model = lgb.train(self.params, train_data, valid_sets=valid_sets)
         logger.info("lgb.train completed!")
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         assert self.model is not None
-        return self.model.predict(X)
+        probs_pred = self.model.predict(X.to_numpy())
+        return pd.DataFrame(probs_pred, index=X.index, columns=["probs_pred"])
 
     def feature_importance(self):
         assert self.model is not None

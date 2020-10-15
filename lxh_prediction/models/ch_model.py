@@ -23,8 +23,8 @@ class CHModel(BaseModel):
     ):
         pass
 
-    def predict(self, X: np.ndarray, feat_names) -> np.ndarray:
-        df = pd.DataFrame(X, columns=feat_names)
+    def predict(self, X):
+        df = X
 
         # agescore
         df["Cagescore"] = 0
@@ -95,4 +95,4 @@ class CHModel(BaseModel):
                 "CBMIscore",
             ]
         ]
-        return (scores.sum(1) >= 25).to_numpy(dtype=int)
+        return (scores.sum(1) >= 25).astype(int)
