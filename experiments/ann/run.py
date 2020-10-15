@@ -5,6 +5,7 @@ import numpy as np
 import lxh_prediction.config as cfg
 from lxh_prediction.models import ANNModel
 from lxh_prediction import data_utils
+from lxh_prediction import metric_utils
 
 
 logging.basicConfig(level=logging.INFO)
@@ -15,7 +16,7 @@ def train(params):
 
     params.update({"num_epoch": 60},)
     model = ANNModel(params)
-    rocs = model.cross_validate(X, y, model.roc_auc_score)
+    rocs = model.cross_validate(X, y, metric_utils.roc_auc_score)
     return np.mean(rocs)
 
 

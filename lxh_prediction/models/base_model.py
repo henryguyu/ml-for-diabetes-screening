@@ -1,7 +1,6 @@
 import logging
 from typing import Callable
 import numpy as np
-from sklearn import metrics
 
 from lxh_prediction.data_utils import split_cross_validation
 
@@ -45,19 +44,3 @@ class BaseModel:
             probs_pred = self.predict(X_test)
             metrics.append(metric_fn(y_test, probs_pred))
         return metrics
-
-    @staticmethod
-    def precision_recall_curve(y_gt, probs_pred, *args, **kwargs):
-        return metrics.precision_recall_curve(y_gt, probs_pred, *args, **kwargs)
-
-    @staticmethod
-    def average_precision_score(y_gt, probs_pred, *args, **kwargs):
-        return metrics.average_precision_score(y_gt, probs_pred, *args, **kwargs)
-
-    @staticmethod
-    def roc_curve(y_gt, probs_pred, *args, **kwargs):
-        return metrics.roc_curve(y_gt, probs_pred, *args, **kwargs)
-
-    @staticmethod
-    def roc_auc_score(y_gt, probs_pred, *args, **kwargs):
-        return metrics.roc_auc_score(y_gt, probs_pred, *args, **kwargs)
