@@ -1,5 +1,5 @@
 import logging
-import numpy as np
+import argparse
 
 import lxh_prediction.config as cfg
 from lxh_prediction import models
@@ -11,56 +11,26 @@ from lxh_prediction import metric_utils
 logging.basicConfig(level=logging.INFO)
 
 
-def train():
-    X, y, feat_names, FPG = data_utils.load_data(
-        cfg.feature_fields["without_FPG"], extra_fields="FPG"
-    )
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--collection", type=str, default="without_FPG")
+    parser.add_argument("--model", type=str, default="LightGBMModel")
+    return parser.parse_args()
+
+
+def train(feat_collection="without_FPG", model_name="LightGBMModel"):
+    X, y = data_utils.load_data(cfg.feature_fields[feat_collection])
     # X, y, feat_names = data_utils.load_data(
     #     None, filename="data/pca_with_FPG.csv", onehot_fields=[]
     # )
     # X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
+    X_train, y_train, X_test, y_test = next(data_utils.split_cross_validation(X, y))
 
-    model = models.LightGBMModel(
-        {
-            "num_leaves": 16,
-            "max_bin": 162,
-            "max_depth": 256,
-            "learning_rate": 0.028753305217484978,
-            "lambda_l1": 0.1,
-            "lambda_l2": 0.001,
-            "feature_fraction": 0.7,
-            "min_data_in_bin": 5,
-            "bagging_fraction": 0.5,
-            "bagging_freq": 4,
-            "path_smooth": 0.01,
-        }
-    )
+    model = getattr(models, model_name)()
 
-    # model = models.ANNModel(
-    #     {
-    #         "lr": 0.04150735339940105,
-    #         "weight_decay": 0.0005,
-    #         "batch_size": 251,
-    #         "enable_lr_scheduler": 0,
-    #         "opt": "Adam",
-    #         "n_channels": 428,
-    #         "n_layers": 5,
-    #         "dropout": 1,
-    #         "activate": "Tanh",
-    #         "branches": [1],
-    #     },
-    #     feature_len=X.shape[1],
-    # )
-
-    # model = models.SVMModel({"kernel": "linear"})
-    # model = models.LogisticRegressionModel()
-
-    # model.load("data/ann_with_FPG.pth")
-
-    # model = LogisticRegressionModel({"solver": "saga", "max_iter": 1000})
+    model.fit(X_train, y_train, X_test, y_test)
 
     # # feat importance
-    # model.fit(X, y)
     # try:
     #     feat_importances = list(zip(feat_names, model.feature_importance()))
     #     feat_importances = sorted(feat_importances, key=lambda x: -x[1])
@@ -68,35 +38,35 @@ def train():
     # except NotImplementedError:
     #     pass
 
-    cv_aucs, cv_probs_pred, cv_indices = model.cross_validate(
-        X, y, metric_fn=metric_utils.roc_auc_score
+    # cv_aucs, cv_probs_pred, cv_indices = model.cross_validate(
+    #     X, y, metric_fn=metric_utils.roc_auc_score
+    # )
+    probs_pred = model.predict(X_test)
+
+    if "FPG" not in X:
+        costs, miss_rate, _ = metric_utils.cost_curve_without_FPG(y_test, probs_pred)
+    else:
+        FPG = X_test["FPG"]
+        costs, miss_rate, _ = metric_utils.cost_curve_with_FPG(y_test, probs_pred, FPG)
+    plot_curve(
+        miss_rate,
+        costs,
+        ylim=[0, 70],
+        xlabel="Prediction miss rate",
+        ylabel="Cost",
+        # subline=((0, 1), (0, 1)),
+        title="Cost vs Miss rate",
     )
-    print(cv_aucs, np.mean(cv_aucs))
-    probs_pred, indices = cv_probs_pred[0], cv_indices[0]
-    y_test = y[indices]
 
-    # costs, miss_rate, _ = metric_utils.cost_curve_without_FPG(y_test, probs_pred)
-
-    # FPG_test = FPG[indices]
-    # costs, miss_rate, _ = metric_utils.cost_curve_with_FPG(y_test, probs_pred, FPG_test)
-
-    # plot_curve(
-    #     miss_rate,
-    #     costs,
-    #     ylim=[0, 70],
-    #     xlabel="Prediction miss rate",
-    #     ylabel="Cost",
-    #     # subline=((0, 1), (0, 1)),
-    # )
-
-    # nag_rate, miss_rate, _ = metric_utils.nag_miss_curve(y_test, probs_pred)
-    # plot_curve(
-    #     miss_rate,
-    #     nag_rate,
-    #     xlabel="Prediction miss rate",
-    #     ylabel="Patients avoiding examination",
-    #     # subline=((0, 1), (0, 1)),
-    # )
+    nag_rate, miss_rate, _ = metric_utils.nag_miss_curve(y_test, probs_pred)
+    plot_curve(
+        miss_rate,
+        nag_rate,
+        xlabel="Prediction miss rate",
+        ylabel="Patients avoiding examination",
+        # subline=((0, 1), (0, 1)),
+        title="Avoid test vs Miss rate"
+    )
 
     precision, recall, _ = metric_utils.precision_recall_curve(y_test, probs_pred)
     plot_curve(
@@ -105,6 +75,7 @@ def train():
         xlabel="Reccall",
         ylabel="Precision",
         # subline=((0, 1), (0, 1)),
+        title="Precision vs Recall",
     )
 
     roc_auc = metric_utils.roc_auc_score(y_test, probs_pred)
@@ -116,6 +87,7 @@ def train():
         xlabel="False positive rate",
         ylabel="True positive rate",
         subline=((0, 1), (0, 1)),
+        title="ROC curve",
     )
 
     print()
@@ -125,4 +97,5 @@ def train():
 
 
 if __name__ == "__main__":
-    train()
+    args = parse_args()
+    train(args.collection, args.model)

@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 class SVMModel(BaseModel):
     def __init__(self, params: Dict = {}):
-        self.params = params
+        self.params = {"kernel": "linear"}
+        self.params.update(params)
         self.model = None
 
     def fit(

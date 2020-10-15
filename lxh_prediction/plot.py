@@ -6,7 +6,7 @@ def plot_curve(
     y,
     name="ROC curve",
     xlim=(0, 1),
-    ylim=(0, 1),
+    ylim=(0, 1.05),
     xlabel="x",
     ylabel="y",
     title=None,

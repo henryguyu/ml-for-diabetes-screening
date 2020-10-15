@@ -1,5 +1,5 @@
 from sklearn import metrics
-from sklearn.metrics._ranking import _binary_clf_curve, stable_cumsum
+from sklearn.metrics._ranking import _binary_clf_curve, stable_cumsum, column_or_1d
 import numpy as np
 
 
@@ -61,6 +61,10 @@ def cost_curve_without_FPG(y_gt, probas_pred, *args, **kwargs):
 
 def cost_curve_with_FPG(y_gt, probas_pred, FPG, *args, **kwargs):
     def _binary_clf_curve_with_FPG(y_gt, probas_pred, y_FPG):
+        y_gt = column_or_1d(y_gt)
+        probas_pred = column_or_1d(probas_pred)
+        y_FPG = column_or_1d(y_FPG)
+
         desc_score_indices = np.argsort(probas_pred, kind="mergesort")[::-1]
         y_score = probas_pred[desc_score_indices]
         y_gt = y_gt[desc_score_indices]

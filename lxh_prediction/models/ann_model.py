@@ -35,7 +35,7 @@ def get_optimizer(model, opt_name, lr, weight_decay):
 
 
 class ANNModel(BaseModel):
-    def __init__(self, params: Dict, feature_len=None):
+    def __init__(self, params: Dict = {}, feature_len=None):
         self.params = {
             "num_epoch": 60,
             "lr": 0.04150735339940105,
