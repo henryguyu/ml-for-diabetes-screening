@@ -1,12 +1,4 @@
 {
-    "boosting": {
-        "_type": "choice",
-        "_value": [
-            "gbdt",
-            "dart",
-            "goss"
-        ]
-    },
     "num_leaves": {
         "_type": "randint",
         "_value": [

@@ -11,44 +11,44 @@ logging.basicConfig(level=logging.INFO)
 
 
 def train():
-    X, y, feat_names = data_utils.load_data(cfg.feature_fields["without_FPG"])
-    # X, y, feat_names = data_utils.load_data(
-    #     None, filename="data/pca_with_FPG.csv", onehot_fields=[]
-    # )
+    # X, y, feat_names = data_utils.load_data(cfg.feature_fields["without_FPG"])
+    X, y, feat_names = data_utils.load_data(
+        None, filename="data/pca_with_FPG.csv", onehot_fields=[]
+    )
     X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
 
-    # model = models.LightGBMModel(
-    #     {
-    #         "boosting": "gbdt",
-    #         "num_leaves": 18,
-    #         "max_bin": 70,
-    #         "max_depth": 64,
-    #         "learning_rate": 0.0002039445148616998,
-    #         "lambda_l1": 0.0001,
-    #         "lambda_l2": 0.001,
-    #         "feature_fraction": 1,
-    #         "min_data_in_bin": 5,
-    #         "bagging_fraction": 0.5,
-    #         "bagging_freq": 4,
-    #         "path_smooth": 0.0001,
-    #     }
-    # )
-
-    model = models.ANNModel(
+    model = models.LightGBMModel(
         {
-            "lr": 0.015596326148781257,
-            "weight_decay": 0.001,
-            "batch_size": 26,
-            "enable_lr_scheduler": 0,
-            "opt": "Adam",
-            "n_channels": 154,
-            "n_layers": 5,
-            "dropout": 0,
-            "activate": "ReLU",
-            "branches": [2, 1],
-        },
-        feature_len=X_train.shape[1],
+            "boosting": "gbdt",
+            "num_leaves": 18,
+            "max_bin": 70,
+            "max_depth": 64,
+            "learning_rate": 0.0002039445148616998,
+            "lambda_l1": 0.0001,
+            "lambda_l2": 0.001,
+            "feature_fraction": 1,
+            "min_data_in_bin": 5,
+            "bagging_fraction": 0.5,
+            "bagging_freq": 4,
+            "path_smooth": 0.0001,
+        }
     )
+
+    # model = models.ANNModel(
+    #     {
+    #         "lr": 0.015596326148781257,
+    #         "weight_decay": 0.001,
+    #         "batch_size": 26,
+    #         "enable_lr_scheduler": 0,
+    #         "opt": "Adam",
+    #         "n_channels": 154,
+    #         "n_layers": 5,
+    #         "dropout": 0,
+    #         "activate": "ReLU",
+    #         "branches": [2, 1],
+    #     },
+    #     feature_len=X_train.shape[1],
+    # )
 
     # model = models.SVMModel({"kernel": "linear"})
     # model = models.LogisticRegressionModel()

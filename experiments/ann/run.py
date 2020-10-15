@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def train(params):
-    X, y, feat_names = data_utils.load_data(cfg.feature_fields["with_FPG"])
+    X, y, feat_names = data_utils.load_data(cfg.feature_fields["without_FPG"])
 
     params.update({"num_epoch": 60},)
     model = ANNModel(params)

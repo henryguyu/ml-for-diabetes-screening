@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class LightGBMModel(BaseModel):
     def __init__(self, params: Dict = {}):
         self.params = {
+            "boosting": "gbdt",
             "num_boost_round": 100,
             "metric": ["auc"],
             "early_stopping_round": 20,
