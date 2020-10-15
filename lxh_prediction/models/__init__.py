@@ -5,6 +5,9 @@ from .lr_model import LogisticRegressionModel
 from .pca_model import PCAModel
 from .svm_model import SVMModel
 
+from .ada_model import ADAModel
+from .ch_model import CHModel
+
 __all__ = [
     "BaseModel",
     "LightGBMModel",
@@ -12,4 +15,6 @@ __all__ = [
     "LogisticRegressionModel",
     "PCAModel",
     "SVMModel",
+    "ADAModel",
+    "CHModel",
 ]

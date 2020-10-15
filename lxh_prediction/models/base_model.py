@@ -35,6 +35,7 @@ class BaseModel:
         y: np.ndarray,
         metric_fn: Callable[[np.ndarray, np.ndarray], float],
         n_folds=5,
+        feat_names=None,
     ):
         metrics = []
         cv_indices = []
@@ -43,7 +44,10 @@ class BaseModel:
             logger.info(f"Cross validation: round {i}")
             X_train, y_train, X_test, y_test, train_indices, valid_indices = batch
             self.fit(X_train, y_train, X_test, y_test)
-            probs_pred = self.predict(X_test)
+            if feat_names is None:
+                probs_pred = self.predict(X_test)
+            else:
+                probs_pred = self.predict(X_test, feat_names)
             metrics.append(metric_fn(y_test, probs_pred))
             cv_indices.append(valid_indices)
             cv_probs_pred.append(probs_pred)

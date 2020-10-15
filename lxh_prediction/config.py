@@ -8,8 +8,13 @@ scalar_fields = "lvighour lvigtime lmidhour lmidtime walkhour lwalktime lseat1ho
 onehot_fields = "occupt living dwell paint radiatn chemic fixture nuclear intere upset sleep tired appeti loser focus fret suicd impact relitn hit satify weich weial tea lusephone".split()
 optional_fields = ["FPG"]
 
+ada_fields = "age lsex ldiafamily lghbs ht ASBP ADBP lphysactive BMI".split()
+ch_fields = "age lsex ldiafamily lghbs ht ASBP wc BMI".split()
+
 feature_fields = {
     "without_FPG": cat_fields + scalar_fields,
     "with_FPG": cat_fields + scalar_fields + optional_fields,
+    "ADA": ada_fields,
+    "CH": ch_fields,
 }
 label_field = "label"
