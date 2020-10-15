@@ -1,7 +1,6 @@
 import logging
 from typing import Dict
 
-import numpy as np
 import pandas as pd
 
 from .base_model import BaseModel
@@ -14,16 +13,10 @@ class CHModel(BaseModel):
         self.params = params
         self.model = None
 
-    def fit(
-        self,
-        X: np.ndarray,
-        y: np.ndarray,
-        X_valid: np.ndarray = None,
-        y_valid: np.ndarray = None,
-    ):
+    def fit(self, *args, **kwargs):
         pass
 
-    def predict(self, X):
+    def predict(self, X: pd.DataFrame):
         df = X
 
         # agescore
@@ -95,4 +88,7 @@ class CHModel(BaseModel):
                 "CBMIscore",
             ]
         ]
-        return (scores.sum(1) >= 25).astype(int)
+        preds = scores.sum(1) >= 25
+        if "FPG" in df:
+            preds = preds | (df["FPG"] >= 7.0)
+        return preds.astype(int)

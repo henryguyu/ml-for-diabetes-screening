@@ -16,5 +16,7 @@ feature_fields = {
     "with_FPG": cat_fields + scalar_fields + optional_fields,
     "ADA": ada_fields,
     "CH": ch_fields,
+    "ADA_FPG": ada_fields + optional_fields,
+    "CH_FPG": ch_fields + optional_fields,
 }
 label_field = "label"

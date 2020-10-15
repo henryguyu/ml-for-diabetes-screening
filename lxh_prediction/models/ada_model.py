@@ -13,13 +13,7 @@ class ADAModel(BaseModel):
         self.params = params
         self.model = None
 
-    def fit(
-        self,
-        X: pd.DataFrame,
-        y: pd.DataFrame,
-        X_valid: pd.DataFrame = None,
-        y_valid: pd.DataFrame = None,
-    ):
+    def fit(self, *args, **kwargs):
         pass
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -57,4 +51,7 @@ class ADAModel(BaseModel):
                 "BMIscore",
             ]
         ]
-        return (scores.sum(1) >= 5).astype(int)
+        preds = scores.sum(1) >= 5
+        if "FPG" in df:
+            preds = preds | (df["FPG"] >= 7.0)
+        return preds.astype(int)
