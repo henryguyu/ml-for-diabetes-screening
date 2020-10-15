@@ -37,10 +37,14 @@ class BaseModel:
         n_folds=5,
     ):
         metrics = []
+        all_y_gt = []
+        all_probs_pred = []
         for i, batch in enumerate(split_cross_validation(X, y, n_folds=n_folds)):
             logger.info(f"Cross validation: round {i}")
             X_train, y_train, X_test, y_test = batch
             self.fit(X_train, y_train, X_test, y_test)
             probs_pred = self.predict(X_test)
             metrics.append(metric_fn(y_test, probs_pred))
-        return metrics
+            all_y_gt.append(y_test)
+            all_probs_pred.append(probs_pred)
+        return metrics, all_y_gt, all_probs_pred

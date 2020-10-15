@@ -16,7 +16,7 @@ def train():
     # X, y, feat_names = data_utils.load_data(
     #     None, filename="data/pca_with_FPG.csv", onehot_fields=[]
     # )
-    X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
+    # X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
 
     model = models.LightGBMModel(
         {
@@ -36,18 +36,18 @@ def train():
 
     # model = models.ANNModel(
     #     {
-    #         "lr": 0.015596326148781257,
-    #         "weight_decay": 0.001,
-    #         "batch_size": 26,
+    #         "lr": 0.04150735339940105,
+    #         "weight_decay": 0.0005,
+    #         "batch_size": 251,
     #         "enable_lr_scheduler": 0,
     #         "opt": "Adam",
-    #         "n_channels": 154,
+    #         "n_channels": 428,
     #         "n_layers": 5,
-    #         "dropout": 0,
-    #         "activate": "ReLU",
-    #         "branches": [2, 1],
+    #         "dropout": 1,
+    #         "activate": "Tanh",
+    #         "branches": [1],
     #     },
-    #     feature_len=X_train.shape[1],
+    #     feature_len=X.shape[1],
     # )
 
     # model = models.SVMModel({"kernel": "linear"})
@@ -57,19 +57,20 @@ def train():
 
     # model = LogisticRegressionModel({"solver": "saga", "max_iter": 1000})
 
-    # cv_aucs = model.cross_validate(X, y, metric_fn=LightGBMModel.roc_auc_score)
-    # print(cv_aucs, np.mean(cv_aucs))
+    # # feat importance
+    # model.fit(X, y)
+    # try:
+    #     feat_importances = list(zip(feat_names, model.feature_importance()))
+    #     feat_importances = sorted(feat_importances, key=lambda x: -x[1])
+    #     print(feat_importances)
+    # except NotImplementedError:
+    #     pass
 
-    model.fit(X_train, y_train, X_test, y_test)
-
-    # feat importance
-    feat_importances = list(zip(feat_names, model.feature_importance()))
-    feat_importances = sorted(feat_importances, key=lambda x: -x[1])
-    print(feat_importances)
-
-    probs_pred = model.predict(X_test)
-    print(y_test.mean())
-    print(np.mean((probs_pred > 0) & y_test))
+    cv_aucs, cv_y_test, cv_probs_pred = model.cross_validate(
+        X, y, metric_fn=metric_utils.roc_auc_score
+    )
+    print(cv_aucs, np.mean(cv_aucs))
+    y_test, probs_pred = cv_y_test[0], cv_probs_pred[0]
 
     nag_rate, miss_rate, _ = metric_utils.nag_miss_curve(y_test, probs_pred)
     plot_curve(

@@ -58,6 +58,8 @@ def split_cross_validation(X: np.ndarray, y: np.ndarray, n_folds: int = 5, seed=
     indices = np.random.permutation(len(X)).tolist()
     num = len(X) // n_folds
     for i in range(n_folds):
-        valid_indices = indices[i * num : (i + 1) * num]
-        train_indices = indices[0 : i * num] + indices[(i + 1) * num :]
+        start = i * num
+        end = (i + 1) * num if i + 1 < n_folds else None
+        valid_indices = indices[start:end]
+        train_indices = indices[0:start] + indices[end:]
         yield X[train_indices], y[train_indices], X[valid_indices], y[valid_indices]

@@ -25,6 +25,7 @@ def nag_miss_curve(y_gt, probas_pred, *args, **kwargs):
     fns = tps[-1] - tps
 
     nag_rate = (tns + fns) / (fps[-1] + tps[-1])
+    # nag_rate = (tns) / (fps[0] + tns[0])
     recall = tps / tps[-1]
     miss_rate = 1 - recall
 
