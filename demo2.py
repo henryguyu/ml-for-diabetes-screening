@@ -46,14 +46,15 @@ def train():
         # subline=((0, 1), (0, 1)),
     )
 
-    # precision, recall, _ = metric_utils.precision_recall_curve(y_test, probs_pred)
-    # plot_curve(
-    #     recall,
-    #     precision,
-    #     xlabel="Reccall",
-    #     ylabel="Precision",
-    #     # subline=((0, 1), (0, 1)),
-    # )
+    precision, recall, _ = metric_utils.precision_recall_curve(y_test, probs_pred)
+    print(precision, recall)
+    plot_curve(
+        recall,
+        precision,
+        xlabel="Reccall",
+        ylabel="Precision",
+        # subline=((0, 1), (0, 1)),
+    )
 
     roc_auc = metric_utils.roc_auc_score(y_test, probs_pred)
     fpr, tpr, _ = metric_utils.roc_curve(y_test, probs_pred)
