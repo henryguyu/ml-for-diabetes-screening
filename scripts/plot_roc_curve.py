@@ -22,21 +22,19 @@ if os.path.isfile(cache_file):
 
 
 def get_cv_preds(model_name="LightGBMModel", feat_collection="without_FPG"):
-    key = (model_name, feat_collection)
-    if key in results:
-        return results[key]
-
     # Load data
     X, y = data_utils.load_data(cfg.feature_fields[feat_collection])
 
-    # Load model
-    model = getattr(models, model_name)()
-    cv_aucs, cv_probs_pred, cv_indices = model.cross_validate(
-        X, y, metric_fn=metric_utils.roc_auc_score
-    )
+    key = (model_name, feat_collection)
+    if key not in results:
+        # Load model
+        model = getattr(models, model_name)()
+        results[key] = model.cross_validate(X, y, metric_fn=metric_utils.roc_auc_score)
+    cv_aucs, cv_probs_pred, cv_indices = results[key]
+
     cv_ys_gt = [y[idx] for idx in cv_indices]
-    results[key] = list(zip(cv_ys_gt, cv_probs_pred))
-    return results[key]
+    cv_y_prob = list(zip(cv_ys_gt, cv_probs_pred))
+    return cv_y_prob
 
 
 # %%
