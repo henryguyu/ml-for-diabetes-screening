@@ -3,8 +3,7 @@ from typing import List, Tuple
 import numpy as np
 from scipy import interp
 from sklearn import metrics
-from sklearn.metrics._ranking import (_binary_clf_curve, column_or_1d,
-                                      stable_cumsum)
+from sklearn.metrics._ranking import _binary_clf_curve, column_or_1d, stable_cumsum
 
 
 def precision_recall_curve(y_gt, probs_pred, *args, **kwargs):
@@ -110,6 +109,7 @@ def mean_curve(
     x_range=(0, 1),
     y_range=(0, 1),
     num_x=101,
+    reverse=False,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Get mean curve: x_base, y_mean, y_lower, y_upper
 
@@ -124,6 +124,9 @@ def mean_curve(
     x_base = np.linspace(0, 1, num_x)
     ys_interp = []
     for x, y in zip(xs, ys):
+        if reverse:
+            x = x[::-1]
+            y = y[::-1]
         y = interp(x_base, x, y)
         ys_interp.append(y)
     ys = np.asarray(ys_interp)
