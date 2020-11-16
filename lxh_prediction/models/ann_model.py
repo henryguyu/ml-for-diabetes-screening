@@ -1,16 +1,17 @@
 import logging
-from typing import Dict
 from copy import deepcopy
+from typing import Dict
 
 import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from .nn_utils import Dataset
-from .nn_model import Model
-from .base_model import BaseModel
 from lxh_prediction import metric_utils
+
+from .base_model import BaseModel
+from .nn_model import Model
+from .nn_utils import Dataset
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

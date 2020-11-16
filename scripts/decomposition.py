@@ -2,8 +2,7 @@
 import pandas as pd
 
 import lxh_prediction.config as cfg
-from lxh_prediction import models
-from lxh_prediction import data_utils
+from lxh_prediction import data_utils, models
 
 # %%
 

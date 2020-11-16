@@ -1,12 +1,11 @@
-from .base_model import BaseModel
-from .lightgbm_model import LightGBMModel
+from .ada_model import ADAModel
 from .ann_model import ANNModel
+from .base_model import BaseModel
+from .ch_model import CHModel
+from .lightgbm_model import LightGBMModel
 from .lr_model import LogisticRegressionModel
 from .pca_model import PCAModel
 from .svm_model import SVMModel
-
-from .ada_model import ADAModel
-from .ch_model import CHModel
 
 __all__ = [
     "BaseModel",

@@ -2,8 +2,8 @@ import logging
 import pickle as pk
 from typing import Dict
 
-from sklearn.decomposition import KernelPCA
 import pandas as pd
+from sklearn.decomposition import KernelPCA
 
 from .base_model import BaseModel
 

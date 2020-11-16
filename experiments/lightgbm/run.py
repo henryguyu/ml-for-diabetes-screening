@@ -1,12 +1,11 @@
 import logging
+
 import nni
 import numpy as np
 
 import lxh_prediction.config as cfg
+from lxh_prediction import data_utils, metric_utils
 from lxh_prediction.models import LightGBMModel
-from lxh_prediction import data_utils
-from lxh_prediction import metric_utils
-
 
 logging.basicConfig(level=logging.INFO)
 

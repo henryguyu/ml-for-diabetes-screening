@@ -1,6 +1,7 @@
-from sklearn import metrics
-from sklearn.metrics._ranking import _binary_clf_curve, stable_cumsum, column_or_1d
 import numpy as np
+from sklearn import metrics
+from sklearn.metrics._ranking import (_binary_clf_curve, column_or_1d,
+                                      stable_cumsum)
 
 
 def precision_recall_curve(y_gt, probs_pred, *args, **kwargs):

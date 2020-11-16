@@ -1,12 +1,9 @@
-import logging
 import argparse
+import logging
 
 import lxh_prediction.config as cfg
-from lxh_prediction import models
-from lxh_prediction import data_utils
+from lxh_prediction import data_utils, metric_utils, models
 from lxh_prediction.plot import plot_curve
-from lxh_prediction import metric_utils
-
 
 logging.basicConfig(level=logging.INFO)
 
