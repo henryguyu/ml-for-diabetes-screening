@@ -6,18 +6,15 @@ def plot_curve(
     y,
     name="ROC curve",
     xlim=(0, 1),
-    ylim=(0, 1.05),
+    ylim=(0, 1.00),
     xlabel="x",
     ylabel="y",
     title=None,
-    subline=None,
+    color="darkorange",
+    lw=2,
+    **kwargs
 ):
-    plt.figure()
-    lw = 2
-    plt.plot(x, y, color="darkorange", lw=lw, label=name)
-    if subline is not None:
-        # subline: [[0, 0], [1, 1]]
-        plt.plot(*subline, color="navy", lw=lw, linestyle="--")
+    plt.plot(x, y, color=color, lw=lw, label=name, **kwargs)
     plt.xlim(xlim or plt.xlim())
     plt.ylim(ylim or plt.ylim())
     plt.xlabel(xlabel)
@@ -25,4 +22,7 @@ def plot_curve(
     if title:
         plt.title(title)
     plt.legend(loc="lower right")
-    plt.show()
+
+
+def plot_range(x, y_lower, y_upper, color="grey", alpha=0.3, **kwargs):
+    plt.fill_between(x, y_lower, y_upper, color=color, alpha=alpha, **kwargs)

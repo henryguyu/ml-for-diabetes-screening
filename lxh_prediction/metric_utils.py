@@ -1,4 +1,7 @@
+from typing import List, Tuple
+
 import numpy as np
+from scipy import interp
 from sklearn import metrics
 from sklearn.metrics._ranking import (_binary_clf_curve, column_or_1d,
                                       stable_cumsum)
@@ -99,3 +102,34 @@ def cost_curve_with_FPG(y_gt, probas_pred, FPG, *args, **kwargs):
     last_ind = tps.searchsorted(tps[-1])
     sl = slice(last_ind, None, -1)
     return costs[sl], miss_rate[sl], thresholds[sl]
+
+
+def mean_curve(
+    xs: List[np.ndarray],
+    ys: List[np.ndarray],
+    x_range=(0, 1),
+    y_range=(0, 1),
+    num_x=101,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Get mean curve: x_base, y_mean, y_lower, y_upper
+
+    Args:
+        xs (List[np.ndarray]): list of x
+        ys (List[np.ndarray]): list of y
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: 
+            x_base, y_mean, y_lower, y_upper
+    """
+    x_base = np.linspace(0, 1, num_x)
+    ys_interp = []
+    for x, y in zip(xs, ys):
+        y = interp(x_base, x, y)
+        ys_interp.append(y)
+    ys = np.asarray(ys_interp)
+    y_mean = ys.mean(axis=0)
+    std = ys.std(axis=0)
+
+    y_upper = np.minimum(y_mean + std, y_range[1])
+    y_lower = np.maximum(y_mean - std, y_range[0])
+    return x_base, y_mean, y_lower, y_upper
