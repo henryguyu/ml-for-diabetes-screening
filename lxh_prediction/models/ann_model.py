@@ -46,19 +46,22 @@ class ANNModel(BaseModel):
             "opt": "Adam",
             "n_channels": 428,
             "n_layers": 5,
-            "dropout": 1,
+            "dropout": 0,
             "activate": "Tanh",
             "branches": [1],
         }
         self.params.update(params)
         self.model = None
         if feature_len is not None:
-            self.model = Model(
-                feature_len=feature_len,
-                n_channels=self.params["n_channels"],
-                n_layers=self.params["n_layers"],
-                params=self.params,
-            )
+            self.model = self._create_model(feature_len)
+
+    def _create_model(self, feature_len):
+        return Model(
+            feature_len=feature_len,
+            n_channels=self.params["n_channels"],
+            n_layers=self.params["n_layers"],
+            params=self.params,
+        )
 
     def fit(
         self,
@@ -74,7 +77,7 @@ class ANNModel(BaseModel):
             X_valid = X_valid.to_numpy().copy()
             y_valid = y_valid.to_numpy().copy()
         params = self.params
-        model = Model(feature_len=X.shape[1])
+        model = self._create_model(feature_len=X.shape[1])
         if use_gpu:
             model = model.cuda()
 
@@ -183,14 +186,15 @@ class ANNModel(BaseModel):
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         assert self.model is not None
         dataloader = torch.utils.data.DataLoader(
-            Dataset(X.to_numpy(float)),
+            Dataset(X),
             batch_size=self.params["batch_size"],
             shuffle=False,
             num_workers=1,
         )
         pred_logits, _ = self._predict_on_dataloader(self.model, dataloader)
         probs_pred = torch.softmax(pred_logits, dim=1).data.cpu().numpy()[:, 1]
-        probs_pred = pd.DataFrame(probs_pred, index=X.index, columns=["probs_pred"])
+        if isinstance(X, pd.DataFrame):
+            probs_pred = pd.DataFrame(probs_pred, index=X.index, columns=["probs_pred"])
         return probs_pred
 
     def save(self, path):

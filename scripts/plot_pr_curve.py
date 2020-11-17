@@ -4,9 +4,8 @@ import logging
 import numpy as np
 
 from lxh_prediction import metric_utils
-from lxh_prediction.plot import plot_curve, plot_range, plt
 from lxh_prediction.exp_utils import get_cv_preds
-
+from lxh_prediction.plot import plot_curve, plot_range, plt
 
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO)

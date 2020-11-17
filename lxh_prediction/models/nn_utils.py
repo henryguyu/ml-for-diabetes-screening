@@ -1,9 +1,10 @@
 import torch
+import pandas as pd
 
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, X, labels=None):
-        self.X = X
+        self.X = X.to_numpy(float) if isinstance(X, pd.DataFrame) else X
         self.labels = labels
 
     def __len__(self):
