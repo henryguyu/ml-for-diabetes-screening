@@ -53,20 +53,36 @@ plot_curve(
 plot_range(x_base, y_lower, y_upper)
 
 # ADA
-cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA")
+cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA", update=True)
+fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
+aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"ADA (no-lab). auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+    color="dodgerblue",
+    linestyle="--",
+)
 tpr, fpr = mean_tpr_fpr(cv_y_prob)
-# plt.plot((0, 1), (tpr, tpr), color="gray", lw=1, linestyle="--")
-
-# plt.plot((fpr, fpr), (0, 1), color="gray", lw=1, linestyle="--")
-plt.scatter(fpr, tpr, marker="^", label="ADA (no-lab).")
+plt.scatter(fpr, tpr, marker="s", color="dodgerblue")
 
 # CDS
-cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH")
+cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH", update=True)
+fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
+aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"CDS (no-lab). auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+    color="darkgreen",
+    linestyle="--",
+)
 tpr, fpr = mean_tpr_fpr(cv_y_prob)
-# plt.plot((0, 1), (tpr, tpr), color="gray", lw=1, linestyle="--")
-# plt.plot((fpr, fpr), (0, 1), color="gray", lw=1, linestyle="--")
-plt.scatter(fpr, tpr, marker="s", label="CDS (no-lab).")
-# plt.annotate(f"({fpr:.3f}, {tpr:.3f})", (fpr + 0.02, tpr))
+plt.scatter(fpr, tpr, marker="s", color="darkgreen")
 
 # Random
 plot_curve(
@@ -113,18 +129,37 @@ plot_curve(
 plot_range(x_base, y_lower, y_upper)
 
 # ADA
-cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA_FPG")
+cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA_FPG", update=True)
+fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
+aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"ADA. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+    color="dodgerblue",
+    linestyle="--",
+)
 tpr, fpr = mean_tpr_fpr(cv_y_prob)
-# plt.plot((0, 1), (tpr, tpr), color="gray", lw=1, linestyle="--")
-# plt.plot((fpr, fpr), (0, 1), color="gray", lw=1, linestyle="--")
-plt.scatter(fpr, tpr, marker="^", label="ADA")
+plt.scatter(fpr, tpr, marker="s", color="dodgerblue")
+
 
 # CDS
-cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH_FPG")
+cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH_FPG", update=True)
+fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
+aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"CDS. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+    color="darkgreen",
+    linestyle="--",
+)
 tpr, fpr = mean_tpr_fpr(cv_y_prob)
-# plt.plot((0, 1), (tpr, tpr), color="gray", lw=1, linestyle="--")
-# plt.plot((fpr, fpr), (0, 1), color="gray", lw=1, linestyle="--")
-plt.scatter(fpr, tpr, marker="s", label="CDS")
+plt.scatter(fpr, tpr, marker="s", color="darkgreen")
 
 # Random
 plot_curve(

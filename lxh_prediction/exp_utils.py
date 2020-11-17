@@ -31,9 +31,13 @@ def get_cv_preds(
 
     cv_ys_gt = [y[idx] for idx in cv_indices]
     cv_y_prob = list(zip(cv_ys_gt, cv_probs_pred))
-    if out_FPG and "FPG" in X:
+    if "FPG" in X:
         FPG = [X["FPG"][idx] for idx in cv_indices]
-        return cv_y_prob, FPG
+        for y_prob, subFPG in zip(cv_y_prob, FPG):
+            y_prob[1][subFPG >= 7] = 1000
+
+        if out_FPG:
+            return cv_y_prob, FPG
 
     return cv_y_prob
 

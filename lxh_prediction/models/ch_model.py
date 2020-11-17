@@ -88,7 +88,9 @@ class CHModel(BaseModel):
                 "CBMIscore",
             ]
         ]
-        preds = scores.sum(1) >= 25
-        if "FPG" in df:
-            preds = preds | (df["FPG"] >= 7.0)
-        return preds.astype(int)
+        preds = scores.sum(1) - 25 + 1e-6
+        return preds
+        # preds = scores.sum(1) >= 25
+        # if "FPG" in df:
+        #     preds = preds | (df["FPG"] >= 7.0)
+        # return preds.astype(int)

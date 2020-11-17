@@ -51,7 +51,9 @@ class ADAModel(BaseModel):
                 "BMIscore",
             ]
         ]
-        preds = scores.sum(1) >= 5
-        if "FPG" in df:
-            preds = preds | (df["FPG"] >= 7.0)
-        return preds.astype(int)
+        preds = scores.sum(1) - 5 + 1e-6
+        return preds
+        # preds = scores.sum(1) >= 5
+        # if "FPG" in df:
+        #     preds = preds | (df["FPG"] >= 7.0)
+        # return preds.astype(int)

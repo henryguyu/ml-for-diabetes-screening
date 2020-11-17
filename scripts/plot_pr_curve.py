@@ -4,8 +4,9 @@ import logging
 import numpy as np
 
 from lxh_prediction import metric_utils
-from lxh_prediction.exp_utils import get_cv_preds
 from lxh_prediction.plot import plot_curve, plot_range, plt
+from lxh_prediction.exp_utils import get_cv_preds
+
 
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
@@ -66,19 +67,48 @@ plot_range(x_base, y_lower, y_upper)
 
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA")
-p, r = mean_precision_recall(cv_y_prob)
-# plt.plot((0, 1), (tpr, tpr), color="gray", lw=1, linestyle="--")
-
-# plt.plot((fpr, fpr), (0, 1), color="gray", lw=1, linestyle="--")
-plt.scatter(r, p, marker="^", label="ADA (no-lab).")
+# p, r = mean_precision_recall(cv_y_prob)
+# plt.scatter(r, p, marker="^", label="ADA (no-lab).")
+precisions, recalls, _ = zip(
+    *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
+)
+aps = np.asarray(
+    [metric_utils.average_precision_score(ys, probs) for ys, probs in cv_y_prob]
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    recalls, precisions, reverse=True
+)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"ADA (no-lab). mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+    color="dodgerblue",
+    linestyle="--",
+)
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH")
-p, r = mean_precision_recall(cv_y_prob)
-# plt.plot((0, 1), (tpr, tpr), color="gray", lw=1, linestyle="--")
-# plt.plot((fpr, fpr), (0, 1), color="gray", lw=1, linestyle="--")
-plt.scatter(r, p, marker="s", label="CDS (no-lab).")
-# plt.annotate(f"({fpr:.3f}, {tpr:.3f})", (fpr + 0.02, tpr))
+# p, r = mean_precision_recall(cv_y_prob)
+# plt.scatter(r, p, marker="s", label="CDS (no-lab).")
+precisions, recalls, _ = zip(
+    *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
+)
+aps = np.asarray(
+    [metric_utils.average_precision_score(ys, probs) for ys, probs in cv_y_prob]
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    recalls, precisions, reverse=True
+)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"CDS (no-lab). mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+    color="darkgreen",
+    linestyle="--",
+)
+
 
 # Random
 plot_curve(
@@ -140,19 +170,47 @@ plot_range(x_base, y_lower, y_upper)
 
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA_FPG")
-p, r = mean_precision_recall(cv_y_prob)
-# plt.plot((0, 1), (tpr, tpr), color="gray", lw=1, linestyle="--")
-
-# plt.plot((fpr, fpr), (0, 1), color="gray", lw=1, linestyle="--")
-plt.scatter(r, p, marker="^", label="ADA.")
+# p, r = mean_precision_recall(cv_y_prob)
+# plt.scatter(r, p, marker="^", label="ADA.")
+precisions, recalls, _ = zip(
+    *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
+)
+aps = np.asarray(
+    [metric_utils.average_precision_score(ys, probs) for ys, probs in cv_y_prob]
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    recalls, precisions, reverse=True
+)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"ADA. mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+    color="dodgerblue",
+    linestyle="--",
+)
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH_FPG")
-p, r = mean_precision_recall(cv_y_prob)
-# plt.plot((0, 1), (tpr, tpr), color="gray", lw=1, linestyle="--")
-# plt.plot((fpr, fpr), (0, 1), color="gray", lw=1, linestyle="--")
-plt.scatter(r, p, marker="s", label="CDS.")
-# plt.annotate(f"({fpr:.3f}, {tpr:.3f})", (fpr + 0.02, tpr))
+# p, r = mean_precision_recall(cv_y_prob)
+# plt.scatter(r, p, marker="s", label="CDS.")
+precisions, recalls, _ = zip(
+    *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
+)
+aps = np.asarray(
+    [metric_utils.average_precision_score(ys, probs) for ys, probs in cv_y_prob]
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    recalls, precisions, reverse=True
+)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"CDS. mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+    color="darkgreen",
+    linestyle="--",
+)
 
 # Random
 plot_curve(
