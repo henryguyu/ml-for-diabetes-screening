@@ -67,8 +67,6 @@ plot_range(x_base, y_lower, y_upper)
 
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA")
-# p, r = mean_precision_recall(cv_y_prob)
-# plt.scatter(r, p, marker="^", label="ADA (no-lab).")
 precisions, recalls, _ = zip(
     *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
 )
@@ -86,11 +84,11 @@ plot_curve(
     color="dodgerblue",
     linestyle="--",
 )
+p, r = mean_precision_recall(cv_y_prob)
+plt.scatter(r, p, marker="s", color="dodgerblue")
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH")
-# p, r = mean_precision_recall(cv_y_prob)
-# plt.scatter(r, p, marker="s", label="CDS (no-lab).")
 precisions, recalls, _ = zip(
     *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
 )
@@ -107,21 +105,12 @@ plot_curve(
     name=f"CDS (no-lab). mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
     color="darkgreen",
     linestyle="--",
-)
-
-
-# Random
-plot_curve(
-    (0, 1),
-    (0, 0),
-    ylim=(-0.02, 1),
     xlabel="Recall",
     ylabel="Precision",
-    color="navy",
-    lw=2,
-    linestyle="--",
-    name="Random",
 )
+p, r = mean_precision_recall(cv_y_prob)
+plt.scatter(r, p, marker="s", color="darkgreen")
+
 plt.legend(loc="upper right")
 
 
@@ -189,11 +178,11 @@ plot_curve(
     color="dodgerblue",
     linestyle="--",
 )
+p, r = mean_precision_recall(cv_y_prob)
+plt.scatter(r, p, marker="s", color="dodgerblue")
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH_FPG")
-# p, r = mean_precision_recall(cv_y_prob)
-# plt.scatter(r, p, marker="s", label="CDS.")
 precisions, recalls, _ = zip(
     *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
 )
@@ -210,19 +199,11 @@ plot_curve(
     name=f"CDS. mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
     color="darkgreen",
     linestyle="--",
-)
-
-# Random
-plot_curve(
-    (0, 1),
-    (0, 0),
-    ylim=(-0.02, 1),
     xlabel="Recall",
     ylabel="Precision",
-    color="navy",
-    lw=2,
-    linestyle="--",
-    name="Random",
 )
+p, r = mean_precision_recall(cv_y_prob)
+plt.scatter(r, p, marker="s", color="darkgreen")
+
 plt.legend(loc="lower left")
 # %%

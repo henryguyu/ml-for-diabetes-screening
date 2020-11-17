@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 # %%
 def mean_cost_missrate(cv_y_prob, FPG=None):
     ys = np.concatenate([y_prob[0] for y_prob in cv_y_prob])
-    probs = np.concatenate([y_prob[1] for y_prob in cv_y_prob])
+    probs = np.concatenate([y_prob[1] for y_prob in cv_y_prob]) > 0
     if FPG is not None:
         FPG = np.concatenate(FPG)
         cost, missrate, _ = metric_utils.cost_curve_with_FPG(ys, probs, FPG)
@@ -27,21 +27,6 @@ def mean_cost_missrate(cv_y_prob, FPG=None):
 # ROC without FPG
 
 fig = plt.figure(figsize=(6, 6))
-
-# ADA
-cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA")
-cost, miss_rate = mean_cost_missrate(cv_y_prob)
-plt.plot((0, 1), (cost, cost), color="gray", lw=1, linestyle="--")
-plt.plot((miss_rate, miss_rate), (0, 70), color="gray", lw=1, linestyle="--")
-plt.scatter(miss_rate, cost, marker="^", label="ADA (no-lab)")
-
-# CDS
-cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH")
-cost, miss_rate = mean_cost_missrate(cv_y_prob)
-plt.plot((0, 1), (cost, cost), color="gray", lw=1, linestyle="--")
-plt.plot((miss_rate, miss_rate), (0, 70), color="gray", lw=1, linestyle="--")
-plt.scatter(miss_rate, cost, marker="s", label="CDS (no-lab)")
-# plt.annotate(f"({fpr:.3f}, {tpr:.3f})", (fpr + 0.02, tpr))
 
 # ANN
 cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
@@ -64,15 +49,53 @@ costs, miss_rates, _ = zip(
 x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
     miss_rates, costs, y_range=(0, 70)
 )
+plot_curve(x_base, y_mean, ylim=(0, 70), name="LGBM (no-lab)")
+plot_range(x_base, y_lower, y_upper)
+
+# ADA
+cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA")
+costs, miss_rates, _ = zip(
+    *(metric_utils.cost_curve_without_FPG(ys, probs) for ys, probs in cv_y_prob)
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    miss_rates, costs, y_range=(0, 70)
+)
 plot_curve(
     x_base,
     y_mean,
     ylim=(0, 70),
-    name="LGBM (no-lab)",
+    name="ADA (no-lab)",
+    color="dodgerblue",
+    linestyle="--",
+)
+cost, miss_rate = mean_cost_missrate(cv_y_prob)
+plt.plot((0, 1), (cost, cost), color="gray", lw=1, linestyle="--")
+plt.plot((miss_rate, miss_rate), (0, 70), color="gray", lw=1, linestyle="--")
+plt.scatter(miss_rate, cost, marker="s", color="dodgerblue")
+
+# CDS
+cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH")
+costs, miss_rates, _ = zip(
+    *(metric_utils.cost_curve_without_FPG(ys, probs) for ys, probs in cv_y_prob)
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    miss_rates, costs, y_range=(0, 70)
+)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 70),
+    name="CDS (no-lab)",
+    color="darkgreen",
+    linestyle="--",
     xlabel="Prediction miss rate",
     ylabel="Average cost per patient",
 )
-plot_range(x_base, y_lower, y_upper)
+cost, miss_rate = mean_cost_missrate(cv_y_prob)
+plt.plot((0, 1), (cost, cost), color="gray", lw=1, linestyle="--")
+plt.plot((miss_rate, miss_rate), (0, 70), color="gray", lw=1, linestyle="--")
+plt.scatter(miss_rate, cost, marker="s", color="darkgreen")
+
 plt.legend(loc="upper right")
 
 
@@ -80,24 +103,6 @@ plt.legend(loc="upper right")
 # ROC with FPG
 fig = plt.figure(figsize=(6, 6))
 
-# ADA
-cv_y_prob, FPG = get_cv_preds(
-    model_name="ADAModel", feat_collection="ADA_FPG", out_FPG=True
-)
-cost, miss_rate = mean_cost_missrate(cv_y_prob, FPG)
-plt.plot((0, 1), (cost, cost), color="gray", lw=1, linestyle="--")
-plt.plot((miss_rate, miss_rate), (0, 70), color="gray", lw=1, linestyle="--")
-plt.scatter(miss_rate, cost, marker="^", label="ADA")
-
-# CDS
-cv_y_prob, FPG = get_cv_preds(
-    model_name="CHModel", feat_collection="CH_FPG", out_FPG=True
-)
-cost, miss_rate = mean_cost_missrate(cv_y_prob, FPG)
-plt.plot((0, 1), (cost, cost), color="gray", lw=1, linestyle="--")
-plt.plot((miss_rate, miss_rate), (0, 70), color="gray", lw=1, linestyle="--")
-plt.scatter(miss_rate, cost, marker="s", label="CDS")
-# plt.annotate(f"({fpr:.3f}, {tpr:.3f})", (fpr + 0.02, tpr))
 
 # ANN
 cv_y_prob, FPG = get_cv_preds(
@@ -130,15 +135,59 @@ costs, miss_rates, _ = zip(
 x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
     miss_rates, costs, y_range=(0, 70)
 )
+plot_curve(x_base, y_mean, ylim=(0, 70), name="LGBM")
+plot_range(x_base, y_lower, y_upper)
+
+# ADA
+cv_y_prob, FPG = get_cv_preds(
+    model_name="ADAModel", feat_collection="ADA_FPG", out_FPG=True
+)
+costs, miss_rates, _ = zip(
+    *(
+        metric_utils.cost_curve_with_FPG(ys, probs, FPG[i])
+        for i, (ys, probs) in enumerate(cv_y_prob)
+    )
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    miss_rates, costs, y_range=(0, 70)
+)
+plot_curve(
+    x_base, y_mean, ylim=(0, 70), name="ADA", color="dodgerblue", linestyle="--",
+)
+cost, miss_rate = mean_cost_missrate(cv_y_prob, FPG)
+plt.plot((0, 1), (cost, cost), color="gray", lw=1, linestyle="--")
+plt.plot((miss_rate, miss_rate), (0, 70), color="gray", lw=1, linestyle="--")
+plt.scatter(miss_rate, cost, marker="s", color="dodgerblue")
+
+# CDS
+cv_y_prob, FPG = get_cv_preds(
+    model_name="CHModel", feat_collection="CH_FPG", out_FPG=True
+)
+costs, miss_rates, _ = zip(
+    *(
+        metric_utils.cost_curve_with_FPG(ys, probs, FPG[i])
+        for i, (ys, probs) in enumerate(cv_y_prob)
+    )
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    miss_rates, costs, y_range=(0, 70)
+)
 plot_curve(
     x_base,
     y_mean,
     ylim=(0, 70),
-    name="LGBM",
+    name="CDS",
+    color="darkgreen",
+    linestyle="--",
     xlabel="Prediction miss rate",
     ylabel="Average cost per patient",
 )
-plot_range(x_base, y_lower, y_upper)
+cost, miss_rate = mean_cost_missrate(cv_y_prob, FPG)
+plt.plot((0, 1), (cost, cost), color="gray", lw=1, linestyle="--")
+plt.plot((miss_rate, miss_rate), (0, 70), color="gray", lw=1, linestyle="--")
+plt.scatter(miss_rate, cost, marker="s", color="darkgreen")
+
+
 plt.legend(loc="upper right")
 
 # %%
