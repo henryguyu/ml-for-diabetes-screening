@@ -7,7 +7,9 @@ import lxh_prediction.config as cfg
 def read_csv(filename, check_nan=True) -> pd.DataFrame:
     df = pd.read_csv(filename).astype(float)
     if check_nan:
-        assert not np.any(df.isnull()), "null value in data"
+        assert not np.any(
+            df.isnull()
+        ), f"null value in {[col for col in df.columns if df[col].isnull().sum() > 0]}"
     return df
 
 

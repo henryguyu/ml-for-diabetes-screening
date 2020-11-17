@@ -37,8 +37,10 @@ shap.force_plot(explainer.expected_value, shap_values[idx, :], X_display.iloc[id
 # %%
 shap.summary_plot(shap_values, X, plot_type="dot")
 # %%
-name = "Ahr"
-shap.dependence_plot(name, shap_values, X, display_features=X_display)
+name = "lusephy"
+shap.dependence_plot(
+    name, shap_values, X, display_features=X_display, interaction_index="age", xmax=30
+)
 
 # %%
 shap.force_plot(explainer.expected_value, shap_values[:1000, :], X.iloc[:1000, :])

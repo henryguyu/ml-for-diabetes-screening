@@ -28,18 +28,18 @@ def mean_cost_missrate(cv_y_prob, FPG=None):
 
 fig = plt.figure(figsize=(6, 6))
 
-# ANN
-cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
-costs, miss_rates, _ = zip(
-    *(metric_utils.cost_curve_without_FPG(ys, probs) for ys, probs in cv_y_prob)
-)
-x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
-    miss_rates, costs, y_range=(0, 70)
-)
-plot_curve(
-    x_base, y_mean, ylim=(0, 70), name="ANN (no-lab)", color="royalblue",
-)
-plot_range(x_base, y_lower, y_upper)
+# # ANN
+# cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
+# costs, miss_rates, _ = zip(
+#     *(metric_utils.cost_curve_without_FPG(ys, probs) for ys, probs in cv_y_prob)
+# )
+# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+#     miss_rates, costs, y_range=(0, 70)
+# )
+# plot_curve(
+#     x_base, y_mean, ylim=(0, 70), name="ANN (no-lab)", color="royalblue",
+# )
+# plot_range(x_base, y_lower, y_upper)
 
 # LGBM
 cv_y_prob = get_cv_preds(model_name="LightGBMModel", feat_collection="without_FPG")
@@ -104,23 +104,23 @@ plt.legend(loc="upper right")
 fig = plt.figure(figsize=(6, 6))
 
 
-# ANN
-cv_y_prob, FPG = get_cv_preds(
-    model_name="ANNModel", feat_collection="with_FPG", out_FPG=True
-)
-costs, miss_rates, _ = zip(
-    *(
-        metric_utils.cost_curve_with_FPG(ys, probs, FPG[i])
-        for i, (ys, probs) in enumerate(cv_y_prob)
-    )
-)
-x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
-    miss_rates, costs, y_range=(0, 70)
-)
-plot_curve(
-    x_base, y_mean, ylim=(0, 70), name="ANN", color="royalblue",
-)
-plot_range(x_base, y_lower, y_upper)
+# # ANN
+# cv_y_prob, FPG = get_cv_preds(
+#     model_name="ANNModel", feat_collection="with_FPG", out_FPG=True
+# )
+# costs, miss_rates, _ = zip(
+#     *(
+#         metric_utils.cost_curve_with_FPG(ys, probs, FPG[i])
+#         for i, (ys, probs) in enumerate(cv_y_prob)
+#     )
+# )
+# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+#     miss_rates, costs, y_range=(0, 70)
+# )
+# plot_curve(
+#     x_base, y_mean, ylim=(0, 70), name="ANN", color="royalblue",
+# )
+# plot_range(x_base, y_lower, y_upper)
 
 # LGBM
 cv_y_prob, FPG = get_cv_preds(

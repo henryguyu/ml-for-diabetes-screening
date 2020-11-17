@@ -1,12 +1,16 @@
 # %%
+import os
+
 import numpy as np
 import pandas as pd
 from missingpy import MissForest
 from sklearn.ensemble import IsolationForest
 
+from lxh_prediction import config as cfg
+
 # %%
-src_file = "../data/missforest.2.csv"
-dst_file = "../data/processed_data_1117.csv"
+src_file = os.path.join(cfg.root, "data/missforest.2.csv")
+dst_file = os.path.join(cfg.root, "data/processed_data_1117.csv")
 df = pd.read_csv(src_file)
 for col in df.columns:
     df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -90,6 +94,7 @@ scalar_fields = [name for name in scalar_fields if name not in calc_fields]
 df_feat = df[cat_fields + scalar_fields]
 null_rate = df_feat.isnull().sum(1) / df_feat.shape[1]
 df = df[null_rate <= 0.4]
+df.index = range(len(df))
 
 df_label = df[label_fields]
 df_feat = df[cat_fields + scalar_fields]
