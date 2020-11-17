@@ -2,10 +2,11 @@
 import numpy as np
 import pandas as pd
 from missingpy import MissForest
+from sklearn.ensemble import IsolationForest
 
 # %%
-src_file = "data/missforest.2.csv"
-dst_file = "data/processed_data.csv"
+src_file = "../data/missforest.2.csv"
+dst_file = "../data/processed_data_1117.csv"
 df = pd.read_csv(src_file)
 for col in df.columns:
     df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -28,6 +29,17 @@ fields_not_one = "glutreat ldia insulin chmed tumor".split()
 drop = np.any(df[fields_not_one] == 1, axis=1)
 df = df[~drop]
 df.index = range(len(df))
+
+# %%
+# 睡觉时间
+drop = (df["lgotosleep"] >= 12) & (df["lgotosleep"] <= 17)
+df = df[~drop]
+lgotosleep = df["lgotosleep"].to_numpy()
+lgotosleep[lgotosleep < 12] += 24
+df["lgotosleep"] = lgotosleep - 24
+df["nigtime"] = df["lgetup"] - df["lgotosleep"]
+df.index = range(len(df))
+
 # %%
 # 异常值去除
 
@@ -36,14 +48,31 @@ def drop_abnormal(arr: np.ndarray) -> np.ndarray:
     valid_arr = arr[~np.isnan(arr)]
     q1, q3 = np.percentile(valid_arr, [25, 75])
     IQR = q3 - q1
-    drop = (arr < q1 - 1.5 * IQR) | (arr > q3 + 1.5 * IQR)
-    return drop
+    k = 2
+    drop = (arr < q1 - k * IQR) | (arr > q3 + k * IQR)
+    return drop, q1 - k * IQR, q3 + k * IQR
 
 
-fields = "".split()
+def drop_abnormal2(arr: np.ndarray):
+    mask = ~np.isnan(arr)
+    valid_arr = arr[mask]
+    preds = IsolationForest(random_state=0).fit_predict(valid_arr[:, None])
+    inliers = valid_arr[preds > 0]
+
+    drop = np.zeros(len(arr), dtype=bool)
+    drop[mask] = preds < 0
+
+    return drop, inliers.min(), inliers.max()
+
+
+# fields = "ASBP ADBP Ahr weight2 height2 BMI wc hc weight20new FPG P2hPG".split()
+fields = "ASBP ADBP Ahr BMI nigtime".split()
 drop = np.zeros(len(df), dtype=bool)
 for name in fields:
-    drop |= drop_abnormal(df[name].values)
+    sub_drop, low, high = drop_abnormal(df[name].values)
+    print(name, low, high, sub_drop.sum())
+    drop |= sub_drop
+print(drop.sum())
 df = df[~drop]
 df.index = range(len(df))
 
@@ -58,9 +87,12 @@ calc_fields = set(calc_fields)
 cat_fields = [name for name in cat_fields if name not in calc_fields]
 scalar_fields = [name for name in scalar_fields if name not in calc_fields]
 
+df_feat = df[cat_fields + scalar_fields]
+null_rate = df_feat.isnull().sum(1) / df_feat.shape[1]
+df = df[null_rate <= 0.4]
+
 df_label = df[label_fields]
 df_feat = df[cat_fields + scalar_fields]
-
 
 # %%
 # 填补缺失值
@@ -85,7 +117,7 @@ df_feat["seattime"] = (
     df_feat["lseat1day"] * df_feat["lseat1hou"]
     + df_feat["lseat2day"] * df_feat["lseat2hou"]
 )
-df_feat["nigtime"] = 24 - df_feat["lgotosleep"] + df_feat["lgetup"]
+df_feat["nigtime"] = df_feat["lgetup"] - df_feat["lgotosleep"]
 df_feat["lbftime_sum"] = df_feat["lbftime2"] * df_feat["lfchild"]
 df_feat["BMI"] = df_feat["weight2"] / (df_feat["height2"] ** 2)
 df_feat["WHR"] = df_feat["wc"] / df_feat["hc"]
