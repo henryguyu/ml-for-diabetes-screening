@@ -13,6 +13,7 @@ shap.initjs()
 # Load data
 feat_collection = "without_FPG"
 X, y = data_utils.load_data(cfg.feature_fields[feat_collection])
+X_FPG, _ = data_utils.load_data(["FPG"])
 X_display = X
 X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
 
@@ -34,6 +35,11 @@ preds = preds.iloc[:, 0] >= thresh
 TP = index[(preds >= thresh) & (y_test > 0)]
 FN = index[(preds < thresh) & (y_test > 0)]
 
+FPG = X_FPG["FPG"]
+hard_mask = (FPG < 7) & (y_test > 0)
+X_hard = X_test[hard_mask]
+y_hard = y_test[hard_mask]
+
 # %%
 explainer = shap.TreeExplainer(
     model.model,
@@ -43,7 +49,7 @@ explainer = shap.TreeExplainer(
 )
 shap_values = explainer.shap_values(X)
 # %%
-idx = 7220
+idx = X_hard.index
 print(y.iloc[idx])
 shap.force_plot(explainer.expected_value, shap_values[idx, :], X_display.iloc[idx, :])
 
@@ -51,7 +57,7 @@ shap.force_plot(explainer.expected_value, shap_values[idx, :], X_display.iloc[id
 # %%
 shap.summary_plot(shap_values, X, plot_type="dot")
 # %%
-name = "lgetup"
+name = "lwork"
 shap.dependence_plot(
     name, shap_values, X, display_features=X_display, interaction_index="age"
 )

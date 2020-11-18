@@ -1,4 +1,5 @@
 import logging
+import argparse
 
 import nni
 import numpy as np
@@ -10,9 +11,15 @@ from lxh_prediction.models import LightGBMModel
 logging.basicConfig(level=logging.INFO)
 
 
-def train(params):
-    X, y = data_utils.load_data(cfg.feature_fields["without_FPG"])
-    # X_train, y_train, X_test, y_test = data_utils.split_data(X, y)
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--collection", type=str, default="without_FPG")
+    parser.add_argument("--metric", type=str, default="roc_auc_score")
+    return parser.parse_args()
+
+
+def train(params, collection="without_FPG", metric="roc_auc_score"):
+    X, y = data_utils.load_data(cfg.feature_fields[collection])
 
     params.update(
         {
@@ -23,12 +30,8 @@ def train(params):
         }
     )
     model = LightGBMModel(params)
-    # model.fit(X_train, y_train, X_test, y_test)
-    rocs = model.cross_validate(X, y, metric_utils.roc_auc_score)[0]
-
-    # probs_pred = model.predict(X_test)
-    # roc_auc = model.roc_auc_score(y_test, probs_pred)
-    return np.mean(rocs)
+    results = model.cross_validate(X, y, getattr(metric_utils, metric))[0]
+    return np.mean(results)
 
 
 if __name__ == "__main__":

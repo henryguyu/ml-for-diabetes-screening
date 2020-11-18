@@ -14,6 +14,9 @@ def read_csv(filename, check_nan=True) -> pd.DataFrame:
 
 
 def onehotify(df: pd.DataFrame, colname, rm_origin=True):
+    n_classes = len(set(df[colname].astype(int)))
+    if n_classes <= 2:
+        return df
     onehots = pd.get_dummies(df[colname].astype(int), prefix=colname)
     if rm_origin:
         df = df.drop(columns=colname)

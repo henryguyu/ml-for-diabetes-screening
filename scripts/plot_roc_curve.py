@@ -45,6 +45,7 @@ cv_y_prob = get_cv_preds(
 )
 fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
 aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+print(aucs)
 x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
 plot_curve(
     x_base,
