@@ -89,6 +89,8 @@ class CHModel(BaseModel):
             ]
         ]
         preds = scores.sum(1) - 25 + 1e-6
+        if "FPG" in df:
+            preds += 100 * (df["FPG"] >= 6.1)
         return preds
         # preds = scores.sum(1) >= 25
         # if "FPG" in df:

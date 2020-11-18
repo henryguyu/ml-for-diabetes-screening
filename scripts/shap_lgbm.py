@@ -49,7 +49,7 @@ explainer = shap.TreeExplainer(
 )
 shap_values = explainer.shap_values(X)
 # %%
-idx = X_hard.index[0]
+idx = X_hard.index[1]
 print(y.iloc[idx])
 shap.force_plot(explainer.expected_value, shap_values[idx, :], X_display.iloc[idx, :])
 
