@@ -24,7 +24,9 @@ def get_cv_preds(
     key = (model_name, feat_collection)
     if key not in results or update:
         # Load model
-        model = getattr(models, model_name)()
+        params = cfg.model_params.get(key, {})
+        print(f"Using params: {params}")
+        model = getattr(models, model_name)(params=params)
         results[key] = model.cross_validate(X, y, metric_fn=metric_utils.roc_auc_score)
         save_cv_preds()
     cv_aucs, cv_probs_pred, cv_indices = results[key]

@@ -48,13 +48,21 @@ df.index = range(len(df))
 # 异常值去除
 
 
-def drop_abnormal(arr: np.ndarray) -> np.ndarray:
+def drop_abnormal(arr: np.ndarray, k=1.5) -> np.ndarray:
     valid_arr = arr[~np.isnan(arr)]
     q1, q3 = np.percentile(valid_arr, [25, 75])
     IQR = q3 - q1
-    k = 2
     drop = (arr < q1 - k * IQR) | (arr > q3 + k * IQR)
     return drop, q1 - k * IQR, q3 + k * IQR
+
+
+def drop_range(arr: np.ndarray, low=None, high=None):
+    drop = np.zeros(len(arr), dtype=bool)
+    if low is not None:
+        drop[arr < low] = True
+    if high is not None:
+        drop[arr > high] = True
+    return drop, low, high
 
 
 def drop_abnormal2(arr: np.ndarray):
@@ -73,9 +81,13 @@ def drop_abnormal2(arr: np.ndarray):
 fields = "ASBP ADBP Ahr BMI nigtime".split()
 drop = np.zeros(len(df), dtype=bool)
 for name in fields:
-    sub_drop, low, high = drop_abnormal(df[name].values)
+    sub_drop, low, high = drop_abnormal(df[name].values, k=2)
     print(name, low, high, sub_drop.sum())
     drop |= sub_drop
+
+drop |= drop_range(df["age"].values, high=90)[0]
+drop |= drop_range(df["lusephy"].values, high=30)[0]
+
 print(drop.sum())
 df = df[~drop]
 df.index = range(len(df))

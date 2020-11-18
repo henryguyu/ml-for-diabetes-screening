@@ -40,7 +40,9 @@ fig = plt.figure(figsize=(6, 6))
 # plot_range(x_base, y_lower, y_upper)
 
 # LGBM
-cv_y_prob = get_cv_preds(model_name="LightGBMModel", feat_collection="without_FPG")
+cv_y_prob = get_cv_preds(
+    model_name="LightGBMModel", feat_collection="without_FPG", update=True
+)
 fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
 aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
 x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
@@ -116,7 +118,9 @@ fig = plt.figure(figsize=(6, 6))
 # plot_range(x_base, y_lower, y_upper)
 
 # LGBM
-cv_y_prob = get_cv_preds(model_name="LightGBMModel", feat_collection="with_FPG")
+cv_y_prob = get_cv_preds(
+    model_name="LightGBMModel", feat_collection="with_FPG", update=True
+)
 fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
 aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
 x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)

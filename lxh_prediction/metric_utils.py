@@ -132,7 +132,7 @@ def mean_curve(
         ys_interp.append(y)
     ys = np.asarray(ys_interp)
     y_mean = ys.mean(axis=0)
-    std = ys.std(axis=0)
+    std = ys.std(axis=0) * 0.5
 
     y_upper = np.minimum(y_mean + std, y_range[1])
     y_lower = np.maximum(y_mean - std, y_range[0])
