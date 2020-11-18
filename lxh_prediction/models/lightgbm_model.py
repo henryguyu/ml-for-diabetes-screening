@@ -18,17 +18,19 @@ class LightGBMModel(BaseModel):
             "metric": ["auc"],
             "early_stopping_round": 20,
             "objective": "binary",
-            "num_leaves": 40,
-            "max_bin": 181,
-            "max_depth": -1,
-            "learning_rate": 0.012177823735146441,
-            "lambda_l1": 0.0005,
-            "lambda_l2": 0.005,
+            "num_threads": 1,
+            "seed": 1063,
+            "num_leaves": 14,
+            "max_bin": 82,
+            "max_depth": 256,
+            "learning_rate": 0.07274623310057575,
+            "lambda_l1": 0.0001,
+            "lambda_l2": 0.0005,
             "feature_fraction": 0.5,
-            "min_data_in_bin": 9,
-            "bagging_fraction": 0.7,
-            "bagging_freq": 4,
-            "path_smooth": 0.01,
+            "min_data_in_bin": 7,
+            "bagging_fraction": 1,
+            "bagging_freq": 32,
+            "path_smooth": 0.001,
         }
         self.params.update(params)
         self.model = None
@@ -46,7 +48,9 @@ class LightGBMModel(BaseModel):
             valid_sets.append(lgb.Dataset(X_valid.to_numpy(), label=y_valid.to_numpy()))
 
         logger.info("Start lgb.train...")
-        self.model = lgb.train(self.params, train_data, valid_sets=valid_sets)
+        self.model = lgb.train(
+            self.params, train_data, valid_sets=valid_sets, verbose_eval=10
+        )
         logger.info("lgb.train completed!")
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:

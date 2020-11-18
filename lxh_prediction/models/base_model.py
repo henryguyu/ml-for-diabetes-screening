@@ -48,7 +48,6 @@ class BaseModel:
 
             probs_pred = self.predict(X_test)
             metrics.append(metric_fn(y_test.to_numpy(), probs_pred.to_numpy()))
-
             cv_indices.append(X_test.index)
             cv_probs_pred.append(probs_pred)
         return metrics, cv_probs_pred, cv_indices

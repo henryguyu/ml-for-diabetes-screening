@@ -49,15 +49,15 @@ explainer = shap.TreeExplainer(
 )
 shap_values = explainer.shap_values(X)
 # %%
-idx = X_hard.index
+idx = X_hard.index[0]
 print(y.iloc[idx])
 shap.force_plot(explainer.expected_value, shap_values[idx, :], X_display.iloc[idx, :])
 
 
 # %%
-shap.summary_plot(shap_values, X, plot_type="dot")
+shap.summary_plot(shap_values, X, plot_type="violin")
 # %%
-name = "lwork"
+name = "Ahr"
 shap.dependence_plot(
     name, shap_values, X, display_features=X_display, interaction_index="age"
 )
