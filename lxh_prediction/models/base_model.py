@@ -4,7 +4,7 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-from lxh_prediction.data_utils import split_cross_validation
+from lxh_prediction.data_utils import split_cross_validation, resample_data
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,7 @@ class BaseModel:
         y: pd.DataFrame,
         metric_fn: Callable[[np.ndarray, np.ndarray], float],
         n_folds=5,
+        resample_train=False,
     ):
         metrics = []
         cv_indices = []
@@ -44,6 +45,8 @@ class BaseModel:
         for i, batch in enumerate(split_cross_validation(X, y, n_folds=n_folds)):
             logger.info(f"Cross validation: round {i}")
             X_train, y_train, X_test, y_test, = batch
+            if resample_train:
+                X_train, y_train = resample_data(X_train, y_train)
             self.fit(X_train, y_train, X_test, y_test)
 
             probs_pred = self.predict(X_test)

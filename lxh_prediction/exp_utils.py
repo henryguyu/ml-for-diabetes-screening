@@ -27,7 +27,9 @@ def get_cv_preds(
         params = cfg.model_params.get(key, {})
         print(f"Using params: {params}")
         model = getattr(models, model_name)(params=params)
-        results[key] = model.cross_validate(X, y, metric_fn=metric_utils.roc_auc_score)
+        results[key] = model.cross_validate(
+            X, y, metric_fn=metric_utils.roc_auc_score, resample_train=True
+        )
         save_cv_preds()
     cv_aucs, cv_probs_pred, cv_indices = results[key]
 

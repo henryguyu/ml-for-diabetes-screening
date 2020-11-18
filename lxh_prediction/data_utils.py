@@ -1,7 +1,9 @@
+# %%
 import numpy as np
 import pandas as pd
 
 import lxh_prediction.config as cfg
+from imblearn.over_sampling import SMOTE
 
 
 def read_csv(filename, check_nan=True) -> pd.DataFrame:
@@ -42,6 +44,11 @@ def load_data(
     return X, y
 
 
+def resample_data(X: pd.DataFrame, y: pd.DataFrame, seed=42):
+    sm = SMOTE(random_state=seed)
+    return sm.fit_resample(X, y)
+
+
 def split_data(X: pd.DataFrame, y: pd.DataFrame = None, train_ratio=0.8, seed=1063):
     np.random.seed(seed)
     indices = np.random.permutation(len(X))
@@ -74,3 +81,14 @@ def split_cross_validation(
         X_valid = X.iloc[valid_indices].copy()
         y_valid = y.iloc[valid_indices].copy()
         yield X_train, y_train, X_valid, y_valid
+
+
+# %%
+if __name__ == "__main__":
+    X, y = load_data(cfg.feature_fields["without_FPG"])
+
+    sm = SMOTE(random_state=42)
+    X2, y2 = sm.fit_resample(X, y)
+
+
+# %%

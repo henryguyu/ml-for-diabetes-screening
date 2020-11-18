@@ -23,8 +23,11 @@ def train(params, collection="without_FPG", metric="roc_auc_score"):
     X, y = data_utils.load_data(cfg.feature_fields[collection])
 
     params.update({"num_epoch": 60})
+    resample = params.get("resample", 0)
     model = ANNModel(params)
-    rocs = model.cross_validate(X, y, getattr(metric_utils, metric))[0]
+    rocs = model.cross_validate(
+        X, y, getattr(metric_utils, metric), resample_train=resample
+    )[0]
     return np.mean(rocs)
 
 
