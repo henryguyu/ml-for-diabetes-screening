@@ -52,7 +52,7 @@ class Cell(nn.Module):
                 for _ in range(n_nodes - 1)
             ]
             self.branches.append(nn.Sequential(*modules))
-        self.dropout = nn.Dropout if dropout else None
+        self.dropout = nn.Dropout() if dropout else None
 
     def forward(self, x):
         x = sum(branch(x) for branch in self.branches)
