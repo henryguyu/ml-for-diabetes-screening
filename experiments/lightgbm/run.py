@@ -21,9 +21,7 @@ def parse_args():
 def train(params, collection="without_FPG", metric="roc_auc_score"):
     X, y = data_utils.load_data(cfg.feature_fields[collection])
 
-    params.update(
-        {"metric": ["auc"]}
-    )
+    params.update({"metric": ["auc"]})
     model = LightGBMModel(params)
     results = model.cross_validate(X, y, getattr(metric_utils, metric))[0]
     return np.mean(results)
@@ -31,5 +29,6 @@ def train(params, collection="without_FPG", metric="roc_auc_score"):
 
 if __name__ == "__main__":
     params = nni.get_next_parameter()
-    roc_auc = train(params)
-    nni.report_final_result(roc_auc)
+    args = parse_args()
+    res = train(params, args.collection, args.metric)
+    nni.report_final_result(res)
