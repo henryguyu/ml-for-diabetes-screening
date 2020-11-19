@@ -1,7 +1,8 @@
 # %%
-import shap
-import numpy as np
 import logging
+
+import numpy as np
+import shap
 
 import lxh_prediction.config as cfg
 from lxh_prediction import data_utils

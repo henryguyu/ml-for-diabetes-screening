@@ -1,7 +1,7 @@
 # %%
-import shap
 import numpy as np
 import pandas as pd
+import shap
 
 import lxh_prediction.config as cfg
 from lxh_prediction import data_utils, metric_utils
@@ -125,7 +125,6 @@ shap.dependence_plot(
 # %%
 
 from scipy.stats import binned_statistic
-
 
 name = "WHR"
 bins = 7

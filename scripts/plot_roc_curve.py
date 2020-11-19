@@ -1,8 +1,11 @@
 # %%
 import logging
+import os
 
 import numpy as np
+import pandas as pd
 
+from lxh_prediction import config as cfg
 from lxh_prediction import metric_utils
 from lxh_prediction.exp_utils import get_cv_preds
 from lxh_prediction.plot import plot_curve, plot_range, plt
@@ -24,6 +27,7 @@ def mean_tpr_fpr(cv_y_prob):
 # ROC without FPG
 
 fig = plt.figure(figsize=(6, 6))
+y_means = {}
 
 # # ANN
 # cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
@@ -54,6 +58,7 @@ plot_curve(
     name=f"LGBM (no-lab). auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
 )
 plot_range(x_base, y_lower, y_upper)
+y_means["LGBM (no-lab)"] = y_mean
 
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA", update=True)
@@ -70,6 +75,9 @@ plot_curve(
 )
 tpr, fpr = mean_tpr_fpr(cv_y_prob)
 plt.scatter(fpr, tpr, marker="s", color="dodgerblue")
+print(f"ADA (no-lab): fpr: {fpr}, tpr: {tpr}")
+y_means["ADA (no-lab)"] = y_mean
+
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH", update=True)
@@ -86,6 +94,9 @@ plot_curve(
 )
 tpr, fpr = mean_tpr_fpr(cv_y_prob)
 plt.scatter(fpr, tpr, marker="s", color="darkgreen")
+print(f"CDS (no-lab): fpr: {fpr}, tpr: {tpr}")
+y_means["CDS (no-lab)"] = y_mean
+
 
 # Random
 plot_curve(
@@ -132,6 +143,7 @@ plot_curve(
     name=f"LGBM. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
 )
 plot_range(x_base, y_lower, y_upper)
+y_means["LGBM"] = y_mean
 
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA_FPG", update=True)
@@ -148,6 +160,8 @@ plot_curve(
 )
 tpr, fpr = mean_tpr_fpr(cv_y_prob)
 plt.scatter(fpr, tpr, marker="s", color="dodgerblue")
+print(f"ADA: fpr: {fpr}, tpr: {tpr}")
+y_means["ADA"] = y_mean
 
 
 # CDS
@@ -165,6 +179,8 @@ plot_curve(
 )
 tpr, fpr = mean_tpr_fpr(cv_y_prob)
 plt.scatter(fpr, tpr, marker="s", color="darkgreen")
+print(f"CDS: fpr: {fpr}, tpr: {tpr}")
+y_means["CDS"] = y_mean
 
 # Random
 plot_curve(
@@ -178,5 +194,11 @@ plot_curve(
     linestyle="--",
     name="Random",
 )
+
+# %%
+df_ymeans = pd.DataFrame(y_means.values(), index=y_means.keys(), columns=x_base)
+output = os.path.join(cfg.root, "data/results/roc_curve.csv")
+os.makedirs(os.path.dirname(output), exist_ok=True)
+df_ymeans.to_csv(output)
 
 # %%

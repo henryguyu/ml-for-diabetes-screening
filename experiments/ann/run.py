@@ -1,6 +1,5 @@
-import logging
 import argparse
-
+import logging
 
 import nni
 import numpy as np

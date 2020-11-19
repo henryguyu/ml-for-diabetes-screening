@@ -17,6 +17,7 @@ def get_cv_preds(
     feat_collection="without_FPG",
     update=False,
     out_FPG=False,
+    resample_train=False,
 ):
     # Load data
     X, y = data_utils.load_data(cfg.feature_fields[feat_collection])
@@ -28,7 +29,7 @@ def get_cv_preds(
         print(f"Using params: {params}")
         model = getattr(models, model_name)(params=params)
         results[key] = model.cross_validate(
-            X, y, metric_fn=metric_utils.roc_auc_score, resample_train=True
+            X, y, metric_fn=metric_utils.roc_auc_score, resample_train=resample_train
         )
         save_cv_preds()
     cv_aucs, cv_probs_pred, cv_indices = results[key]

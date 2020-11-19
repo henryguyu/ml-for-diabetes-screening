@@ -1,9 +1,9 @@
 # %%
 import numpy as np
 import pandas as pd
+from imblearn.over_sampling import SMOTE
 
 import lxh_prediction.config as cfg
-from imblearn.over_sampling import SMOTE
 
 
 def read_csv(filename, check_nan=True) -> pd.DataFrame:

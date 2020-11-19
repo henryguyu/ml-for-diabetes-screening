@@ -1,7 +1,8 @@
 # %%
 from collections import Counter
-from sklearn.datasets import make_classification
+
 from imblearn.over_sampling import SMOTE  # doctest: +NORMALIZE_WHITESPACE
+from sklearn.datasets import make_classification
 
 # %%
 X, y = make_classification(

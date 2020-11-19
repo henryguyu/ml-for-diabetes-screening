@@ -1,8 +1,11 @@
 # %%
 import logging
+import os
 
 import numpy as np
+import pandas as pd
 
+from lxh_prediction import config as cfg
 from lxh_prediction import metric_utils
 from lxh_prediction.exp_utils import get_cv_preds
 from lxh_prediction.plot import plot_curve, plot_range, plt
@@ -24,6 +27,7 @@ def mean_precision_recall(cv_y_prob):
 # PR without FPG
 
 fig = plt.figure(figsize=(6, 6))
+y_means = {}
 
 # # ANN
 # cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
@@ -63,6 +67,7 @@ plot_curve(
     name=f"LGBM (no-lab). mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
 )
 plot_range(x_base, y_lower, y_upper)
+y_means["LGBM (no-lab)"] = y_mean
 
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA")
@@ -85,6 +90,8 @@ plot_curve(
 )
 p, r = mean_precision_recall(cv_y_prob)
 plt.scatter(r, p, marker="s", color="dodgerblue")
+print(f"ADA (no-lab): precision: {p}, recall: {r}")
+y_means["ADA (no-lab)"] = y_mean
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH")
@@ -109,6 +116,8 @@ plot_curve(
 )
 p, r = mean_precision_recall(cv_y_prob)
 plt.scatter(r, p, marker="s", color="darkgreen")
+print(f"CDS (no-lab): precision: {p}, recall: {r}")
+y_means["CDS (no-lab)"] = y_mean
 
 plt.legend(loc="upper right")
 
@@ -155,6 +164,7 @@ plot_curve(
     name=f"LGBM. mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
 )
 plot_range(x_base, y_lower, y_upper)
+y_means["LGBM"] = y_mean
 
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA_FPG")
@@ -179,6 +189,8 @@ plot_curve(
 )
 p, r = mean_precision_recall(cv_y_prob)
 plt.scatter(r, p, marker="s", color="dodgerblue")
+print(f"ADA: precision: {p}, recall: {r}")
+y_means["ADA"] = y_mean
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH_FPG")
@@ -203,6 +215,14 @@ plot_curve(
 )
 p, r = mean_precision_recall(cv_y_prob)
 plt.scatter(r, p, marker="s", color="darkgreen")
+print(f"CDS: precision: {p}, recall: {r}")
+y_means["CDS"] = y_mean
 
 plt.legend(loc="lower left")
+# %%
+df_ymeans = pd.DataFrame(y_means.values(), index=y_means.keys(), columns=x_base)
+output = os.path.join(cfg.root, "data/results/pr_curve.csv")
+os.makedirs(os.path.dirname(output), exist_ok=True)
+df_ymeans.to_csv(output)
+
 # %%

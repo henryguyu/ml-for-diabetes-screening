@@ -4,7 +4,7 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-from lxh_prediction.data_utils import split_cross_validation, resample_data
+from lxh_prediction.data_utils import resample_data, split_cross_validation
 
 logger = logging.getLogger(__name__)
 
