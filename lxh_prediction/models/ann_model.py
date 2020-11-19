@@ -37,7 +37,7 @@ def get_optimizer(model, opt_name, lr, weight_decay):
 
 
 class ANNModel(BaseModel):
-    def __init__(self, params: Dict = {}, feature_len=None):
+    def __init__(self, params: Dict = {}, feature_len=None, metric="roc_auc_score"):
         self.params = {
             "num_epoch": 60,
             "lr": 0.04186361307523874,
@@ -55,6 +55,7 @@ class ANNModel(BaseModel):
         self.model = None
         if feature_len is not None:
             self.model = self._create_model(feature_len)
+        self.metric_fn = getattr(metric_utils, metric)
 
     def _create_model(self, feature_len):
         return Model(
@@ -165,9 +166,7 @@ class ANNModel(BaseModel):
         loss = nn.functional.cross_entropy(pred_logits, y_gt)
 
         probs_pred = torch.softmax(pred_logits, dim=1).data.cpu().numpy()[:, 1]
-        auc = metric_utils.roc_auc_score(
-            y_gt.data.cpu().numpy(), probs_pred, average="macro"
-        )
+        auc = self.metric_fn(y_gt.data.cpu().numpy(), probs_pred)
         return loss.item(), auc
 
     def _predict_on_dataloader(self, model: Model, dataloader: DataLoader):

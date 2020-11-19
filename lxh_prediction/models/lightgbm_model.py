@@ -11,11 +11,16 @@ logger = logging.getLogger(__name__)
 
 
 class LightGBMModel(BaseModel):
-    def __init__(self, params: Dict = {}):
+    def __init__(self, params: Dict = {}, metric="roc_auc_score"):
+        metric_map = {
+            "roc_auc_score": "auc",
+            "average_precision_score": "average_precision",
+        }
+
         self.params = {
             "boosting": "gbdt",
             "num_boost_round": 100,
-            "metric": ["auc"],
+            "metric": [metric_map[metric]],
             "early_stopping_round": 20,
             "objective": "binary",
             "num_threads": 1,

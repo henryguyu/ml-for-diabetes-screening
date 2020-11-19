@@ -16,5 +16,5 @@ tuner:
     #choice: maximize, minimize
     optimize_mode: maximize
 trial:
-  command: python run.py --collection without_FPG
+  command: python run.py --collection without_FPG --metric average_precision_score
   codeDir: .

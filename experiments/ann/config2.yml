@@ -1,6 +1,6 @@
 authorName: longc
 experimentName: ANN Parameter Search
-trialConcurrency: 4
+trialConcurrency: 1
 maxExecDuration: 2d
 maxTrialNum: 400
 #choice: local, remote, pai
@@ -22,5 +22,5 @@ tuner:
 #     optimize_mode: maximize
 #     start_step: 30
 trial:
-  command: python run.py --collection with_FPG
+  command: python run.py --collection with_FPG --metric average_precision_score
   codeDir: .
