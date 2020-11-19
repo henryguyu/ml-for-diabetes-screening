@@ -19,8 +19,8 @@ def decomp_with_PCA(X, y, feat_names):
 
 
 for name, fields in cfg.feature_fields.items():
-    X, y, feat_names = data_utils.load_data(fields)
-    df = decomp_with_PCA(X, y, feat_names)
+    X, y = data_utils.load_data(fields)
+    df = decomp_with_PCA(X, y, X.columns)
     df.to_csv(f"data/pca_{name}.csv", index=False)
 
 # %%
@@ -45,8 +45,8 @@ def decomp_with_SVM(X, y, feat_names):
 
 
 for name, fields in cfg.feature_fields.items():
-    X, y, feat_names = data_utils.load_data(fields)
-    df = decomp_with_SVM(X, y, feat_names)
+    X, y = data_utils.load_data(fields)
+    df = decomp_with_SVM(X, y, X.columns)
     df.to_csv(f"data/svm_{name}.csv", index=False)
 
 # %%
