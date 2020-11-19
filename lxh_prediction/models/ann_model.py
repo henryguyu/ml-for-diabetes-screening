@@ -6,6 +6,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from lxh_prediction import metric_utils
 
@@ -39,16 +40,16 @@ class ANNModel(BaseModel):
     def __init__(self, params: Dict = {}, feature_len=None):
         self.params = {
             "num_epoch": 60,
-            "lr": 0.04150735339940105,
-            "weight_decay": 0.0005,
-            "batch_size": 251,
-            "enable_lr_scheduler": 0,
+            "lr": 0.04186361307523874,
+            "weight_decay": 0.0001,
+            "batch_size": 105,
+            "enable_lr_scheduler": 1,
             "opt": "Adam",
-            "n_channels": 428,
+            "n_channels": 379,
             "n_layers": 5,
-            "dropout": 0,
-            "activate": "Tanh",
-            "branches": [1],
+            "dropout": 1,
+            "activate": "Sigmoid",
+            "branches": [1, 0],
         }
         self.params.update(params)
         self.model = None
@@ -112,18 +113,19 @@ class ANNModel(BaseModel):
         best_epoch = None
         best_auc = None
         best_state_dict = None
-        for epoch in range(params["num_epoch"]):
-            train_loss = self._train_one_epoch(model, optimizer, train_loader)
+        for epoch in tqdm(range(params["num_epoch"]), desc="Train"):
+            self._train_one_epoch(model, optimizer, train_loader)
             if lr_scheduler is not None:
-                lr_scheduler.step(epoch)
+                lr_scheduler.step()
             if not valid_loader:
-                logger.info(f"[{epoch}] train_loss: {train_loss:.3f}")
+                # logger.info(f"[{epoch}] train_loss: {train_loss:.3f}")
+                pass
             else:
                 valid_loss, valid_auc = self._valid_one_epoch(model, valid_loader)
-                logger.info(
-                    f"[{epoch}] train_loss: {train_loss:.3f} "
-                    f"test_loss: {valid_loss:.3f}, test_auc: {valid_auc:.4f}"
-                )
+                # logger.info(
+                #     f"[{epoch}] train_loss: {train_loss:.3f} "
+                #     f"test_loss: {valid_loss:.3f}, test_auc: {valid_auc:.4f}"
+                # )
                 # if lr_scheduler is not None:
                 #     lr_scheduler.step(valid_auc)
                 if best_auc is None or valid_auc > best_auc:
