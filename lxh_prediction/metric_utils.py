@@ -119,7 +119,7 @@ def mean_curve(
         ys (List[np.ndarray]): list of y
 
     Returns:
-        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: 
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
             x_base, y_mean, y_lower, y_upper
     """
     x_base = np.linspace(0, 1, num_x)
