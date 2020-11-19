@@ -2,5 +2,5 @@ imbalanced-learn
 scikit-learn
 scipy
 numpy
-lightgbm
+lightgbm==3.1.0
 shap

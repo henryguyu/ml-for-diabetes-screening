@@ -25,6 +25,7 @@ class LightGBMModel(BaseModel):
             "objective": "binary",
             "num_threads": 1,
             "seed": 1063,
+            "deterministic": True,
             "num_leaves": 20,
             "max_bin": 7,
             "max_depth": -1,
