@@ -1,3 +1,5 @@
+from ast import literal_eval
+
 import torch.nn as nn
 
 
@@ -42,6 +44,9 @@ class Cell(nn.Module):
         branches=(1,),
     ):
         super().__init__()
+        if isinstance(branches, str):
+            branches = literal_eval(branches)
+
         self.branches = nn.ModuleList()
         for n_nodes in branches:
             if n_nodes == 0:

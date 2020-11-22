@@ -11,11 +11,11 @@ useAnnotation: false
 tuner:
   #choice: TPE, Random, Anneal, Evolution, BatchTuner, MetisTuner
   #SMAC (SMAC should be installed through nnictl)
-  builtinTunerName: TPE
-  classArgs:
-    #choice: maximize, minimize
-    parallel_optimize: True
-    optimize_mode: maximize
+  builtinTunerName: Random
+  # classArgs:
+  #   #choice: maximize, minimize
+  #   parallel_optimize: True
+  #   optimize_mode: maximize
 # assessor:
 #   builtinAssessorName: Medianstop
 #   classArgs:

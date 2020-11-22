@@ -60,6 +60,13 @@
             1
         ]
     },
+    "bn": {
+        "_type": "choice",
+        "_value": [
+            0,
+            1
+        ]
+    },
     "activate": {
         "_type": "choice",
         "_value": [
@@ -72,9 +79,9 @@
     "branches": {
         "_type": "choice",
         "_value": [
-            [1],
-            [1, 0],
-            [2, 1]
+            "[1]",
+            "[1, 0]",
+            "[2, 1]"
         ]
     }
 }
