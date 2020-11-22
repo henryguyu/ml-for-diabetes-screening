@@ -32,6 +32,7 @@ def train(params, collection="without_FPG", metric="roc_auc_score"):
 
 if __name__ == "__main__":
     params = nni.get_next_parameter()
+    # params = cfg.model_params[("LightGBMModel", "without_FPG")]
     args = parse_args()
     res = train(params, args.collection, args.metric)
     nni.report_final_result(res)

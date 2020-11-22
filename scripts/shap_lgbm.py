@@ -35,6 +35,8 @@ index = y_test.index
 
 preds = preds.iloc[:, 0] >= thresh
 TP = index[(preds >= thresh) & (y_test > 0)]
+FP = index[(preds >= thresh) & (y_test == 0)]
+TN = index[(preds < thresh) & (y_test == 0)]
 FN = index[(preds < thresh) & (y_test > 0)]
 
 FPG = X_FPG["FPG"]
@@ -51,13 +53,14 @@ explainer = shap.TreeExplainer(
 )
 shap_values = explainer.shap_values(X)
 # %%
-idx = X_hard.index[1]
+# idx = X_hard.index[2]
+idx = TN[12]
 print(y.iloc[idx])
 shap.force_plot(explainer.expected_value, shap_values[idx, :], X_display.iloc[idx, :])
 
 
 # %%
-shap.summary_plot(shap_values, X, plot_type="violin")
+shap.summary_plot(shap_values, X, plot_type="dot")
 # %%
 name = "BMI"
 shap.dependence_plot(
@@ -126,7 +129,7 @@ shap.dependence_plot(
 
 from scipy.stats import binned_statistic
 
-name = "WHR"
+name = "BMI"
 bins = 7
 mean, bin_edges, _ = binned_statistic(X[name], RR[name], "mean", bins=bins)
 std, _, _ = binned_statistic(X[name], RR[name], "std", bins=bins)
@@ -136,6 +139,8 @@ plot_curve(
     mean,
     xlim=(x.min(), x.max()),
     ylim=(mean.min() - std.max(), mean.max() + std.max()),
+    xlabel=name,
+    ylabel="Relative risk"
 )
 plot_range(x, mean - std, mean + std)
 # %%
