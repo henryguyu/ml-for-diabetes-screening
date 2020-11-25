@@ -29,25 +29,26 @@ def mean_precision_recall(cv_y_prob):
 fig = plt.figure(figsize=(6, 6))
 y_means = {}
 
-# # ANN
-# cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
-# precisions, recalls, _ = zip(
-#     *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
-# )
-# aps = np.asarray(
-#     [metric_utils.average_precision_score(ys, probs) for ys, probs in cv_y_prob]
-# )
-# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
-#     recalls, precisions, reverse=True
-# )
-# plot_curve(
-#     x_base,
-#     y_mean,
-#     ylim=(0, 1),
-#     name=f"ANN (no-lab). mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
-#     color="royalblue",
-# )
-# plot_range(x_base, y_lower, y_upper)
+# ANN
+cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
+precisions, recalls, _ = zip(
+    *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
+)
+aps = np.asarray(
+    [metric_utils.average_precision_score(ys, probs) for ys, probs in cv_y_prob]
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    recalls, precisions, reverse=True
+)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"ANN (no-lab). mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+    color="royalblue",
+)
+plot_range(x_base, y_lower, y_upper)
+y_means["ANN (no-lab)"] = y_mean
 
 # LGBM
 cv_y_prob = get_cv_preds(model_name="LightGBMModel", feat_collection="without_FPG")
@@ -126,25 +127,26 @@ plt.legend(loc="upper right")
 
 fig = plt.figure(figsize=(6, 6))
 
-# # ANN
-# cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="with_FPG")
-# precisions, recalls, _ = zip(
-#     *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
-# )
-# aps = np.asarray(
-#     [metric_utils.average_precision_score(ys, probs) for ys, probs in cv_y_prob]
-# )
-# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
-#     recalls, precisions, reverse=True
-# )
-# plot_curve(
-#     x_base,
-#     y_mean,
-#     ylim=(0, 1),
-#     name=f"ANN. mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
-#     color="royalblue",
-# )
-# plot_range(x_base, y_lower, y_upper)
+# ANN
+cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="with_FPG")
+precisions, recalls, _ = zip(
+    *(metric_utils.precision_recall_curve(ys, probs) for ys, probs in cv_y_prob)
+)
+aps = np.asarray(
+    [metric_utils.average_precision_score(ys, probs) for ys, probs in cv_y_prob]
+)
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+    recalls, precisions, reverse=True
+)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"ANN. mAP={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+    color="royalblue",
+)
+plot_range(x_base, y_lower, y_upper)
+y_means["ANN"] = y_mean
 
 # LGBM
 cv_y_prob = get_cv_preds(model_name="LightGBMModel", feat_collection="with_FPG")

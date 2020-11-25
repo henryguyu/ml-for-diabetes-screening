@@ -29,19 +29,22 @@ def mean_tpr_fpr(cv_y_prob):
 fig = plt.figure(figsize=(6, 6))
 y_means = {}
 
-# # ANN
-# cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
-# fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
-# aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
-# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
-# plot_curve(
-#     x_base,
-#     y_mean,
-#     ylim=(0, 1),
-#     name=f"ANN (no-lab). auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
-#     color="royalblue",
-# )
-# plot_range(x_base, y_lower, y_upper)
+# ANN
+cv_y_prob = get_cv_preds(
+    model_name="ANNModel", feat_collection="without_FPG", update=True
+)
+fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
+aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"ANN (no-lab). auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+    color="royalblue",
+)
+plot_range(x_base, y_lower, y_upper)
+y_means["ANN (no-lab)"] = y_mean
 
 # LGBM
 cv_y_prob = get_cv_preds(
@@ -115,19 +118,20 @@ plot_curve(
 
 fig = plt.figure(figsize=(6, 6))
 
-# # ANN
-# cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="with_FPG")
-# fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
-# aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
-# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
-# plot_curve(
-#     x_base,
-#     y_mean,
-#     ylim=(0, 1),
-#     name=f"ANN. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
-#     color="royalblue",
-# )
-# plot_range(x_base, y_lower, y_upper)
+# ANN
+cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="with_FPG", update=True)
+fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
+aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+plot_curve(
+    x_base,
+    y_mean,
+    ylim=(0, 1),
+    name=f"ANN. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+    color="royalblue",
+)
+plot_range(x_base, y_lower, y_upper)
+y_means["ANN"] = y_mean
 
 # LGBM
 cv_y_prob = get_cv_preds(
