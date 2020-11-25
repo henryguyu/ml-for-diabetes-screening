@@ -26,6 +26,7 @@ model.fit(X_train.iloc[:-1], y_train.iloc[:-1], X_test, y_test)
 
 # %%
 # Predict
+all_preds = model.predict(X)
 preds = model.predict(X_test)
 precisions, recalls, threshs = metric_utils.precision_recall_curve(y_test, preds)
 idx = len(recalls) - np.searchsorted(recalls[::-1], 0.8, side="right") - 1
@@ -45,24 +46,28 @@ X_hard = X_test[hard_mask]
 y_hard = y_test[hard_mask]
 
 # %%
-explainer = shap.TreeExplainer(
-    model.model,
-    data=shap.sample(X_train, 100),
-    model_output="probability",
-    feature_perturbation="interventional",
-)
-shap_values = explainer.shap_values(X)
+# explainer = shap.TreeExplainer(
+#     model.model,
+#     data=shap.sample(X_train, 100),
+#     model_output="probability",
+#     feature_perturbation="interventional",
+# )
+explainer = shap.TreeExplainer(model.model)
+shap_values = explainer.shap_values(X)[1]
+expected_value = explainer.expected_value[1]
 # %%
 # idx = X_hard.index[2]
-idx = TN[12]
+idx = TN[23]
 print(y.iloc[idx])
-shap.force_plot(explainer.expected_value, shap_values[idx, :], X_display.iloc[idx, :])
+shap.force_plot(
+    expected_value, shap_values[idx, :], X_display.iloc[idx, :]
+)
 
 
 # %%
 shap.summary_plot(shap_values, X, plot_type="dot")
 # %%
-name = "BMI"
+name = "WHR"
 shap.dependence_plot(
     name, shap_values, X, display_features=X_display, interaction_index=None
 )
@@ -113,14 +118,19 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
+def desigmoid(p):
+    return np.log(p / (1 - p))
+
+
 shap_v = pd.DataFrame(shap_values, columns=X.columns)
-P0 = y.mean()
-phi0 = np.log(P0 / (1 - P0))
+# P0 = y.mean()
+# phi0 = np.log(P0 / (1 - P0))
+phi0 = expected_value
 
 RR = sigmoid(shap_v + phi0) / sigmoid(phi0)
 
 # %%
-name = "mike0"
+name = "lsex"
 shap.dependence_plot(
     name, RR.values, X, display_features=X_display, interaction_index=None
 )
@@ -130,7 +140,7 @@ shap.dependence_plot(
 from scipy.stats import binned_statistic
 
 name = "BMI"
-bins = 7
+bins = 10
 mean, bin_edges, _ = binned_statistic(X[name], RR[name], "mean", bins=bins)
 std, _, _ = binned_statistic(X[name], RR[name], "std", bins=bins)
 x = (bin_edges[1:] + bin_edges[:-1]) * 0.5
@@ -140,7 +150,7 @@ plot_curve(
     xlim=(x.min(), x.max()),
     ylim=(mean.min() - std.max(), mean.max() + std.max()),
     xlabel=name,
-    ylabel="Relative risk"
+    ylabel="Relative risk",
 )
 plot_range(x, mean - std, mean + std)
 # %%
