@@ -28,23 +28,24 @@ def mean_tpr_fpr(cv_y_prob):
 
 fig = plt.figure(figsize=(6, 6))
 y_means = {}
+x_means = {}
 
-# ANN
-cv_y_prob = get_cv_preds(
-    model_name="ANNModel", feat_collection="without_FPG", update=True
-)
-fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
-aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
-x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
-plot_curve(
-    x_base,
-    y_mean,
-    ylim=(0, 1),
-    name=f"ANN (no-lab). auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
-    color="royalblue",
-)
-plot_range(x_base, y_lower, y_upper)
-y_means["ANN (no-lab)"] = y_mean
+# # ANN
+# cv_y_prob = get_cv_preds(
+#     model_name="ANNModel", feat_collection="without_FPG", update=True
+# )
+# fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
+# aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+# plot_curve(
+#     x_base,
+#     y_mean,
+#     ylim=(0, 1),
+#     name=f"ANN (no-lab). auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+#     color="royalblue",
+# )
+# plot_range(x_base, y_lower, y_upper)
+# y_means["ANN (no-lab)"] = y_mean
 
 # LGBM
 cv_y_prob = get_cv_preds(
@@ -63,6 +64,9 @@ plot_curve(
 plot_range(x_base, y_lower, y_upper)
 y_means["LGBM (no-lab)"] = y_mean
 
+y_base, x_mean = metric_utils.mean_curve(tprs, fprs)[:2]
+x_means["LGBM (no-lab)"] = x_mean
+
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA", update=True)
 fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
@@ -80,6 +84,9 @@ tpr, fpr = mean_tpr_fpr(cv_y_prob)
 plt.scatter(fpr, tpr, marker="s", color="dodgerblue")
 print(f"ADA (no-lab): fpr: {fpr}, tpr: {tpr}")
 y_means["ADA (no-lab)"] = y_mean
+
+y_base, x_mean = metric_utils.mean_curve(tprs, fprs)[:2]
+x_means["ADA (no-lab)"] = x_mean
 
 
 # CDS
@@ -100,6 +107,9 @@ plt.scatter(fpr, tpr, marker="s", color="darkgreen")
 print(f"CDS (no-lab): fpr: {fpr}, tpr: {tpr}")
 y_means["CDS (no-lab)"] = y_mean
 
+y_base, x_mean = metric_utils.mean_curve(tprs, fprs)[:2]
+x_means["CDS (no-lab)"] = x_mean
+
 
 # Random
 plot_curve(
@@ -118,20 +128,20 @@ plot_curve(
 
 fig = plt.figure(figsize=(6, 6))
 
-# ANN
-cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="with_FPG", update=True)
-fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
-aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
-x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
-plot_curve(
-    x_base,
-    y_mean,
-    ylim=(0, 1),
-    name=f"ANN. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
-    color="royalblue",
-)
-plot_range(x_base, y_lower, y_upper)
-y_means["ANN"] = y_mean
+# # ANN
+# cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="with_FPG", update=True)
+# fprs, tprs, _ = zip(*(metric_utils.roc_curve(ys, probs) for ys, probs in cv_y_prob))
+# aucs = np.asarray([metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob])
+# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+# plot_curve(
+#     x_base,
+#     y_mean,
+#     ylim=(0, 1),
+#     name=f"ANN. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+#     color="royalblue",
+# )
+# plot_range(x_base, y_lower, y_upper)
+# y_means["ANN"] = y_mean
 
 # LGBM
 cv_y_prob = get_cv_preds(
@@ -148,6 +158,9 @@ plot_curve(
 )
 plot_range(x_base, y_lower, y_upper)
 y_means["LGBM"] = y_mean
+
+y_base, x_mean = metric_utils.mean_curve(tprs, fprs)[:2]
+x_means["LGBM"] = x_mean
 
 # ADA
 cv_y_prob = get_cv_preds(model_name="ADAModel", feat_collection="ADA_FPG", update=True)
@@ -166,6 +179,9 @@ tpr, fpr = mean_tpr_fpr(cv_y_prob)
 plt.scatter(fpr, tpr, marker="s", color="dodgerblue")
 print(f"ADA: fpr: {fpr}, tpr: {tpr}")
 y_means["ADA"] = y_mean
+
+y_base, x_mean = metric_utils.mean_curve(tprs, fprs)[:2]
+x_means["ADA"] = x_mean
 
 
 # CDS
@@ -186,6 +202,9 @@ plt.scatter(fpr, tpr, marker="s", color="darkgreen")
 print(f"CDS: fpr: {fpr}, tpr: {tpr}")
 y_means["CDS"] = y_mean
 
+y_base, x_mean = metric_utils.mean_curve(tprs, fprs)[:2]
+x_means["CDS"] = x_mean
+
 # Random
 plot_curve(
     (0, 1),
@@ -204,5 +223,10 @@ df_ymeans = pd.DataFrame(y_means.values(), index=y_means.keys(), columns=x_base)
 output = os.path.join(cfg.root, "data/results/roc_curve.csv")
 os.makedirs(os.path.dirname(output), exist_ok=True)
 df_ymeans.to_csv(output)
+
+df_xmeans = pd.DataFrame(x_means.values(), index=x_means.keys(), columns=y_base)
+output = os.path.join(cfg.root, "data/results/roc_curve_transpose.csv")
+os.makedirs(os.path.dirname(output), exist_ok=True)
+df_xmeans.to_csv(output)
 
 # %%
