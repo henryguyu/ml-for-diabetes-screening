@@ -29,18 +29,19 @@ def mean_nag_missrate(cv_y_prob):
 
 fig = plt.figure(figsize=(6, 6))
 y_means = {}
+x_means = {}
 
-# ANN
-cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
-nag_rates, miss_rates, _ = zip(
-    *(metric_utils.nag_miss_curve(ys, probs) for ys, probs in cv_y_prob)
-)
-x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(miss_rates, nag_rates)
-plot_curve(
-    x_base, y_mean, ylim=(0, 1), name="ANN (no-lab)", color="royalblue",
-)
-plot_range(x_base, y_lower, y_upper)
-y_means["ANN (no-lab)"] = y_mean
+# # ANN
+# cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="without_FPG")
+# nag_rates, miss_rates, _ = zip(
+#     *(metric_utils.nag_miss_curve(ys, probs) for ys, probs in cv_y_prob)
+# )
+# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(miss_rates, nag_rates)
+# plot_curve(
+#     x_base, y_mean, ylim=(0, 1), name="ANN (no-lab)", color="royalblue",
+# )
+# plot_range(x_base, y_lower, y_upper)
+# y_means["ANN (no-lab)"] = y_mean
 
 # LGBM
 cv_y_prob = get_cv_preds(model_name="LightGBMModel", feat_collection="without_FPG")
@@ -51,6 +52,9 @@ x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(miss_rates, nag_rates
 plot_curve(x_base, y_mean, ylim=(0, 1), name="LGBM (no-lab)")
 plot_range(x_base, y_lower, y_upper)
 y_means["LGBM (no-lab)"] = y_mean
+
+y_base, x_mean = metric_utils.mean_curve(nag_rates, miss_rates)[:2]
+x_means["LGBM (no-lab)"] = x_mean
 
 
 # ADA
@@ -68,6 +72,10 @@ plt.plot((miss_rate, miss_rate), (0, 1), color="gray", lw=1, linestyle="--")
 plt.scatter(miss_rate, nag_rate, marker="s", color="dodgerblue")
 print(f"ADA (no-lab): avoid: {nag_rate}, miss_rate: {miss_rate}")
 y_means["ADA (no-lab)"] = y_mean
+
+y_base, x_mean = metric_utils.mean_curve(nag_rates, miss_rates)[:2]
+x_means["ADA (no-lab)"] = x_mean
+
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH")
@@ -92,23 +100,27 @@ plt.scatter(miss_rate, nag_rate, marker="s", color="darkgreen")
 print(f"CDS (no-lab): avoid: {nag_rate}, miss_rate: {miss_rate}")
 y_means["CDS (no-lab)"] = y_mean
 
+y_base, x_mean = metric_utils.mean_curve(nag_rates, miss_rates)[:2]
+x_means["CDS (no-lab)"] = x_mean
+
+fig.savefig(os.path.join(cfg.root, "data/results/nag_missrate_withoutFPG.pdf"))
 
 # %%
 # Nag-miss with FPG
 
 fig = plt.figure(figsize=(6, 6))
 
-# ANN
-cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="with_FPG")
-nag_rates, miss_rates, _ = zip(
-    *(metric_utils.nag_miss_curve(ys, probs) for ys, probs in cv_y_prob)
-)
-x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(miss_rates, nag_rates)
-plot_curve(
-    x_base, y_mean, ylim=(0, 1), name="ANN", color="royalblue",
-)
-plot_range(x_base, y_lower, y_upper)
-y_means["ANN"] = y_mean
+# # ANN
+# cv_y_prob = get_cv_preds(model_name="ANNModel", feat_collection="with_FPG")
+# nag_rates, miss_rates, _ = zip(
+#     *(metric_utils.nag_miss_curve(ys, probs) for ys, probs in cv_y_prob)
+# )
+# x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(miss_rates, nag_rates)
+# plot_curve(
+#     x_base, y_mean, ylim=(0, 1), name="ANN", color="royalblue",
+# )
+# plot_range(x_base, y_lower, y_upper)
+# y_means["ANN"] = y_mean
 
 # LGBM
 cv_y_prob = get_cv_preds(model_name="LightGBMModel", feat_collection="with_FPG")
@@ -119,6 +131,9 @@ x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(miss_rates, nag_rates
 plot_curve(x_base, y_mean, ylim=(0, 1), name="LGBM")
 plot_range(x_base, y_lower, y_upper)
 y_means["LGBM"] = y_mean
+
+y_base, x_mean = metric_utils.mean_curve(nag_rates, miss_rates)[:2]
+x_means["LGBM"] = x_mean
 
 
 # ADA
@@ -134,6 +149,10 @@ plt.plot((miss_rate, miss_rate), (0, 1), color="gray", lw=1, linestyle="--")
 plt.scatter(miss_rate, nag_rate, marker="s", color="dodgerblue")
 print(f"ADA: avoid: {nag_rate}, miss_rate: {miss_rate}")
 y_means["ADA"] = y_mean
+
+y_base, x_mean = metric_utils.mean_curve(nag_rates, miss_rates)[:2]
+x_means["ADA"] = x_mean
+
 
 # CDS
 cv_y_prob = get_cv_preds(model_name="CHModel", feat_collection="CH_FPG")
@@ -158,11 +177,21 @@ plt.scatter(miss_rate, nag_rate, marker="s", color="darkgreen")
 print(f"CDS: avoid: {nag_rate}, miss_rate: {miss_rate}")
 y_means["CDS"] = y_mean
 
+y_base, x_mean = metric_utils.mean_curve(nag_rates, miss_rates)[:2]
+x_means["CDS"] = x_mean
+
+fig.savefig(os.path.join(cfg.root, "data/results/nag_missrate_withFPG.pdf"))
+
 
 # %%
 df_ymeans = pd.DataFrame(y_means.values(), index=y_means.keys(), columns=x_base)
 output = os.path.join(cfg.root, "data/results/nag_missrate.csv")
 os.makedirs(os.path.dirname(output), exist_ok=True)
 df_ymeans.to_csv(output)
+
+df_xmeans = pd.DataFrame(x_means.values(), index=x_means.keys(), columns=y_base)
+output = os.path.join(cfg.root, "data/results/nag_missrate_transpose.csv")
+os.makedirs(os.path.dirname(output), exist_ok=True)
+df_xmeans.to_csv(output)
 
 # %%

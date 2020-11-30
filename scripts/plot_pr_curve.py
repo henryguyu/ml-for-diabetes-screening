@@ -72,7 +72,7 @@ plot_curve(
 plot_range(x_base, y_lower, y_upper)
 y_means["LGBM (no-lab)"] = y_mean
 
-y_base, x_mean = metric_utils.mean_curve(precisions, recalls, reverse=True)[:2]
+y_base, x_mean = metric_utils.mean_curve(precisions, recalls)[:2]
 x_means["LGBM (no-lab)"] = x_mean
 
 # ADA
@@ -99,7 +99,7 @@ plt.scatter(r, p, marker="s", color="dodgerblue")
 print(f"ADA (no-lab): precision: {p}, recall: {r}")
 y_means["ADA (no-lab)"] = y_mean
 
-y_base, x_mean = metric_utils.mean_curve(precisions, recalls, reverse=True)[:2]
+y_base, x_mean = metric_utils.mean_curve(precisions, recalls)[:2]
 x_means["ADA (no-lab)"] = x_mean
 
 # CDS
@@ -128,12 +128,12 @@ plt.scatter(r, p, marker="s", color="darkgreen")
 print(f"CDS (no-lab): precision: {p}, recall: {r}")
 y_means["CDS (no-lab)"] = y_mean
 
-y_base, x_mean = metric_utils.mean_curve(precisions, recalls, reverse=True)[:2]
+y_base, x_mean = metric_utils.mean_curve(precisions, recalls)[:2]
 x_means["CDS (no-lab)"] = x_mean
 
 plt.legend(loc="upper right")
 
-fig.savefig(os.path.join(cfg.root, "data/results/pr_curve_withoutFPG.png"))
+fig.savefig(os.path.join(cfg.root, "data/results/pr_curve_withoutFPG.pdf"))
 
 # %% PR with FPG
 
@@ -180,7 +180,7 @@ plot_curve(
 plot_range(x_base, y_lower, y_upper)
 y_means["LGBM"] = y_mean
 
-y_base, x_mean = metric_utils.mean_curve(precisions, recalls, reverse=True)[:2]
+y_base, x_mean = metric_utils.mean_curve(precisions, recalls)[:2]
 x_means["LGBM"] = x_mean
 
 
@@ -210,7 +210,7 @@ plt.scatter(r, p, marker="s", color="dodgerblue")
 print(f"ADA: precision: {p}, recall: {r}")
 y_means["ADA"] = y_mean
 
-y_base, x_mean = metric_utils.mean_curve(precisions, recalls, reverse=True)[:2]
+y_base, x_mean = metric_utils.mean_curve(precisions, recalls)[:2]
 x_means["ADA"] = x_mean
 
 # CDS
@@ -239,12 +239,12 @@ plt.scatter(r, p, marker="s", color="darkgreen")
 print(f"CDS: precision: {p}, recall: {r}")
 y_means["CDS"] = y_mean
 
-y_base, x_mean = metric_utils.mean_curve(precisions, recalls, reverse=True)[:2]
+y_base, x_mean = metric_utils.mean_curve(precisions, recalls)[:2]
 x_means["CDS"] = x_mean
 
 plt.legend(loc="lower left")
 
-fig.savefig(os.path.join(cfg.root, "data/results/pr_curve_withFPG.png"))
+fig.savefig(os.path.join(cfg.root, "data/results/pr_curve_withFPG.pdf"))
 
 # %%
 df_ymeans = pd.DataFrame(y_means.values(), index=y_means.keys(), columns=x_base)

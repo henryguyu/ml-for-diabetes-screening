@@ -124,6 +124,8 @@ plot_curve(
     name="Random",
 )
 
+fig.savefig(os.path.join(cfg.root, "data/results/roc_curve_withoutFPG.pdf"))
+
 # %%
 
 fig = plt.figure(figsize=(6, 6))
@@ -217,6 +219,8 @@ plot_curve(
     linestyle="--",
     name="Random",
 )
+
+fig.savefig(os.path.join(cfg.root, "data/results/roc_curve_withFPG.pdf"))
 
 # %%
 df_ymeans = pd.DataFrame(y_means.values(), index=y_means.keys(), columns=x_base)

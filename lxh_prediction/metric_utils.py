@@ -122,7 +122,7 @@ def mean_curve(
         Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
             x_base, y_mean, y_lower, y_upper
     """
-    x_base = np.linspace(0, 1, num_x)
+    x_base = np.linspace(*x_range, num_x)
     ys_interp = []
     for x, y in zip(xs, ys):
         if reverse:
