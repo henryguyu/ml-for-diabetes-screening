@@ -3,8 +3,7 @@ from typing import List, Tuple
 import numpy as np
 from scipy import interp
 from sklearn import metrics
-from sklearn.metrics._ranking import (_binary_clf_curve, column_or_1d,
-                                      stable_cumsum)
+from sklearn.metrics._ranking import _binary_clf_curve, column_or_1d, stable_cumsum
 
 
 def precision_recall_curve(y_gt, probs_pred, *args, **kwargs):
@@ -30,12 +29,13 @@ def binary_clf_curve(y_gt, probas_pred, *args, **kwargs):
     return tps, fps, tns, fns, thresholds
 
 
-def nag_miss_curve(y_gt, probas_pred, *args, **kwargs):
+def pos_miss_curve(y_gt, probas_pred, *args, **kwargs):
     tps, fps, tns, fns, thresholds = binary_clf_curve(
         y_gt, probas_pred, *args, **kwargs
     )
 
     nag_rate = (tns + fns) / (fps[-1] + tps[-1])
+    pos_rate = 1 - nag_rate
     # nag_rate = (tns) / (fps[0] + tns[0])
     recall = tps / tps[-1]
     miss_rate = 1 - recall
@@ -44,7 +44,7 @@ def nag_miss_curve(y_gt, probas_pred, *args, **kwargs):
     # and reverse the outputs so recall is decreasing
     last_ind = tps.searchsorted(tps[-1])
     sl = slice(last_ind, None, -1)
-    return np.r_[nag_rate[sl], 1], np.r_[miss_rate[sl], 1], thresholds[sl]
+    return np.r_[pos_rate[sl], 0], np.r_[miss_rate[sl], 1], thresholds[sl]
 
 
 def cost_curve_without_FPG(y_gt, probas_pred, *args, **kwargs):
