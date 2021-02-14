@@ -54,6 +54,11 @@ class ADAModel(BaseModel):
         preds = scores.sum(1) - 5 + 1e-6
         if "FPG" in df:
             preds += 100 * (df["FPG"] >= 6.1)
+        if "P2hPG" in df:
+            preds += 100 * (df["P2hPG"] >= 11.1)
+        if "HbA1c" in df:
+            preds += 100 * (df["HbA1c"] >= 6.5)
+
         return preds
         # preds = scores.sum(1) >= 5
         # if "FPG" in df:

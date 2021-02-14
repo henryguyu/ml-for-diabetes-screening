@@ -146,7 +146,7 @@ df_feat["WHtR"] = df_feat["wc"] / (df_feat["height2"] * 100)
 df = pd.concat([df_feat, df_label], axis=1)
 df["label_WHO"] = ((df["FPG"] >= 7.0) | (df["P2hPG"] >= 11.1)).astype(int)
 df["label_ADA"] = (
-    (df["FPG"] >= 7.0) | (df["P2hPG"] >= 11.1) | (df["HbA1c"] >= 6.4)
+    (df["FPG"] >= 7.0) | (df["P2hPG"] >= 11.1) | (df["HbA1c"] >= 6.5)
 ).astype(int)
 
 # %%

@@ -20,10 +20,6 @@ feature_fields = {
     "with_FPG": cat_fields + scalar_fields + optional_fields,
     "imp_wo_FPG": important_fields,
     "imp_with_FPG": important_fields + optional_fields,
-    "ADA": ada_fields,
-    "CH": ch_fields,
-    "ADA_FPG": ada_fields + ["FPG"],
-    "CH_FPG": ch_fields + ["FPG"],
     # =======
     "full_non_lab": cat_fields + scalar_fields,
     "top20_non_lab": important_fields,
@@ -34,6 +30,14 @@ feature_fields = {
     "FPG": important_fields + ["FPG"],
     "2hPG": important_fields + ["P2hPG"],
     "HbA1c": important_fields + ["HbA1c"],
+    "ADA": ada_fields,
+    "CH": ch_fields,
+    "ADA_FPG": ada_fields + ["FPG"],
+    "CH_FPG": ch_fields + ["FPG"],
+    "ADA_2hPG": ada_fields + ["P2hPG"],
+    "CH_2hPG": ch_fields + ["P2hPG"],
+    "ADA_HbA1c": ada_fields + ["HbA1c"],
+    "CH_HbA1c": ch_fields + ["HbA1c"],
 }
 label_field = "label_WHO"
 color_map = cm.get_cmap("tab10").colors
