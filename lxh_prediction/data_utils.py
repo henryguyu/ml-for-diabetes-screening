@@ -1,7 +1,7 @@
 # %%
 import numpy as np
 import pandas as pd
-from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTE, SMOTENC
 
 import lxh_prediction.config as cfg
 
@@ -45,6 +45,10 @@ def load_data(
 
 
 def resample_data(X: pd.DataFrame, y: pd.DataFrame, seed=42):
+    # cat_fields = set(cfg.cat_fields)
+    # cat_indices = [i for i, name in enumerate(X.columns) if name in cat_fields]
+    # sm = SMOTENC(categorical_features=cat_indices, random_state=42)
+
     sm = SMOTE(random_state=seed)
     return sm.fit_resample(X, y)
 
@@ -87,7 +91,11 @@ def split_cross_validation(
 if __name__ == "__main__":
     X, y = load_data(cfg.feature_fields["without_FPG"])
 
-    sm = SMOTE(random_state=42)
+    cat_fields = set(cfg.cat_fields)
+    cat_indices = [i for i, name in enumerate(X.columns) if name in cat_fields]
+    print(cat_indices)
+
+    sm = SMOTENC(categorical_features=cat_indices, random_state=42)
     X2, y2 = sm.fit_resample(X, y)
 
 

@@ -24,5 +24,5 @@ def plot_curve(
     plt.legend(loc="lower right")
 
 
-def plot_range(x, y_lower, y_upper, color="grey", alpha=0.3, **kwargs):
+def plot_range(x, y_lower, y_upper, color="grey", alpha=0.2, **kwargs):
     plt.fill_between(x, y_lower, y_upper, color=color, alpha=alpha, **kwargs)

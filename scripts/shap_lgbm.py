@@ -13,7 +13,7 @@ shap.initjs()
 
 # %%
 # Load data
-feat_collection = "without_FPG"
+feat_collection = "full_non_lab"
 X, y = data_utils.load_data(cfg.feature_fields[feat_collection])
 X_FPG, _ = data_utils.load_data(["FPG"])
 X_display = X
@@ -55,21 +55,54 @@ y_hard = y_test[hard_mask]
 explainer = shap.TreeExplainer(model.model)
 shap_values = explainer.shap_values(X)[1]
 expected_value = explainer.expected_value[1]
+
+feature_names = list(X.columns)
+name_to_index = {name: i for i, name in enumerate(feature_names)}
+name_maps = {
+    "Ahr": "Rhr",
+    "age": "Age",
+    "lwork": "Work",
+    "wc": "WC",
+    "culutrue": "Education",
+    "lusephy": "Phone",
+    "ASBP": "SBP",
+    "ADBP": "DBP",
+    "lgetup": "Getuptime",
+    "hc": "HC",
+    "lvigday": "HeavyPAday",
+    "lvighour": "HeavyPAhour",
+    "ldrinking": "Drinking",
+    "frye0": "Fry",
+    "ntime": "Naptime",
+    "nigtime": "Nitime",
+}
+for ori, new in name_maps.items():
+    feature_names[name_to_index[ori]] = new
 # %%
 # idx = X_hard.index[2]
 idx = TN[23]
 print(y.iloc[idx])
 shap.force_plot(
-    expected_value, shap_values[idx, :], X_display.iloc[idx, :]
+    expected_value,
+    shap_values[idx, :],
+    X_display.iloc[idx, :],
+    feature_names=feature_names,
 )
 
 
 # %%
-shap.summary_plot(shap_values, X, plot_type="dot")
+shap.summary_plot(
+    shap_values, X, plot_type="dot", feature_names=feature_names,
+)
 # %%
-name = "WHR"
+name = "BMI"
 shap.dependence_plot(
-    name, shap_values, X, display_features=X_display, interaction_index=None
+    name,
+    shap_values,
+    X,
+    display_features=X_display,
+    interaction_index=None,
+    feature_names=feature_names,
 )
 
 # %%
@@ -130,7 +163,7 @@ phi0 = expected_value
 RR = sigmoid(shap_v + phi0) / sigmoid(phi0)
 
 # %%
-name = "lsex"
+name = "wc"
 shap.dependence_plot(
     name, RR.values, X, display_features=X_display, interaction_index=None
 )
@@ -139,8 +172,8 @@ shap.dependence_plot(
 
 from scipy.stats import binned_statistic
 
-name = "BMI"
-bins = 10
+name = "wc"
+bins = 5
 mean, bin_edges, _ = binned_statistic(X[name], RR[name], "mean", bins=bins)
 std, _, _ = binned_statistic(X[name], RR[name], "std", bins=bins)
 x = (bin_edges[1:] + bin_edges[:-1]) * 0.5

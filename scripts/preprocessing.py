@@ -10,7 +10,7 @@ from lxh_prediction import config as cfg
 
 # %%
 src_file = os.path.join(cfg.root, "data/missforest.2.csv")
-dst_file = os.path.join(cfg.root, "data/processed_data_1118.4.csv")
+dst_file = os.path.join(cfg.root, "data/processed_data_0214.csv")
 df = pd.read_csv(src_file)
 for col in df.columns:
     df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -25,7 +25,7 @@ for col in nan97:
 
 # %%
 # 样本剔除
-fields_required = "age lsex FPG P2hPG".split()
+fields_required = "age lsex FPG P2hPG HbA1c".split()
 drop = np.any(df[fields_required].isnull(), axis=1)
 df = df[~drop]
 
@@ -78,15 +78,17 @@ def drop_abnormal2(arr: np.ndarray):
 
 
 # fields = "ASBP ADBP Ahr weight2 height2 BMI wc hc weight20new FPG P2hPG".split()
-fields = "ASBP ADBP Ahr BMI nigtime".split()
+fields = "nigtime".split()
 drop = np.zeros(len(df), dtype=bool)
 for name in fields:
     sub_drop, low, high = drop_abnormal(df[name].values, k=2)
     print(name, low, high, sub_drop.sum())
+    print(df[name][sub_drop])
     drop |= sub_drop
 
 drop |= drop_range(df["age"].values, high=90)[0]
 drop |= drop_range(df["lusephy"].values, high=30)[0]
+drop |= drop_range(df["Ahr"].values, high=300)[0]
 
 print(drop.sum())
 df = df[~drop]
@@ -96,7 +98,7 @@ df.index = range(len(df))
 # select features
 cat_fields = "lsex age occupt marriage3 living llivealone dwell paint radiatn chemic fixture nuclear intere upset sleep tired appeti loser focus fret suicd impact relitn hit satify culutrue wm prisch junsch sensch juncoll lmi lstroke lcvd ht ldiafamily lsmoking lsmoked lneversmoke ldrinking ldrinked lneverdrink weich weial weime1 weime0 weime3 weime99 etime breakd lunchd dinnerd brehome breeate brerest lunhome luneate lunrest dinhome dineate dinrest grae0 ptae0 poke0 befe0 chie0 fise0 vege0 frue0 juie0 egge0 mike0 beae0 frye0 juce0 sode0 cake0 brne0 saue0 fure0 cofe0 orge0 vite0 tea lntea lteai lwork highintenswork leisphysical lphysactive lvigorous lvigday lmiddle lmidday walk0 walkday lseat1a lseat2a lseat1day lseat2day lgoodday1 lbadday1 lusephone lgest lfchild lfboy lfgirl lmbigb lmbn lmmboy lmmgirl lmchild lmboy lmgirl lfbigb lfbn lfmboy lfmgirl lght lghbs lbrestfe lmenop hypertension".split()
 scalar_fields = "lvighour lvigtime lmidhour lmidtime walkhour lwalktime lseat1hou lseat2hou seattime ntime lgotosleep lgetup nigtime lusephy lbftime2 lbftime_sum ASBP ADBP Ahr weight2 height2 wc hc BMI WHR WHtR weight20new".split()
-label_fields = "FPG P2hPG".split()
+label_fields = "FPG P2hPG HbA1c".split()
 calc_fields = "leisphysical lphysactive lvigtime lmidtime lwalktime seattime nigtime lbftime_sum BMI WHR WHtR".split()
 
 calc_fields = set(calc_fields)
@@ -142,7 +144,10 @@ df_feat["WHR"] = df_feat["wc"] / df_feat["hc"]
 df_feat["WHtR"] = df_feat["wc"] / (df_feat["height2"] * 100)
 
 df = pd.concat([df_feat, df_label], axis=1)
-df["label"] = ((df["FPG"] >= 7.0) | (df["P2hPG"] >= 11.1)).astype(int)
+df["label1"] = ((df["FPG"] >= 7.0) | (df["P2hPG"] >= 11.1)).astype(int)
+df["label2"] = (
+    (df["FPG"] >= 7.0) | (df["P2hPG"] >= 11.1) | (df["HbA1c"] >= 6.4)
+).astype(int)
 
 # %%
 # Save
