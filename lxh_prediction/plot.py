@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 import matplotlib.pyplot as plt
 import lxh_prediction.config as cfg
@@ -21,8 +22,8 @@ def plot_curve(
     plt.plot(x, y, color=color, lw=lw, label=name, **kwargs)
     plt.xlim(xlim or plt.xlim())
     plt.ylim(ylim or plt.ylim())
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    plt.xlabel(xlabel, fontdict={"size": 12})
+    plt.ylabel(ylabel, fontdict={"size": 12})
     if title:
         plt.title(title)
     plt.legend(loc="lower right")
@@ -33,15 +34,54 @@ def plot_range(x, y_lower, y_upper, color="grey", alpha=0.2, **kwargs):
 
 
 class ExpFigure:
-    def __init__(self):
-        self.fig = plt.figure(figsize=(5, 5))
+    def __init__(self, figure=None):
+        if figure is None:
+            self.fig = plt.figure(figsize=(6, 6))
+            self.ax = self.fig.add_subplot(111)
+        else:
+            self.fig = figure.fig
+            self.ax = figure.ax
         self.y_means = {}
         self.x_means = {}
         self.x_base = None
         self.y_base = None
 
+        self.points = []
+
     def run(self, name, model, feat_collection):
         raise NotImplementedError
+
+    def add_point(self, x, y):
+        self.points.append((x, y))
+
+    def xticks(self):
+        return np.linspace(0, 1, 6)
+
+    def yticks(self):
+        return np.linspace(0, 1, 6)
+
+    def plot(self):
+        def gen_ticks(values, ticks):
+            keep = np.ones(len(ticks), dtype=np.bool)
+            for v in values:
+                dists = np.abs(ticks - v)
+                print(v)
+                idx = np.argmin(dists)
+                if dists[idx] < 0.05 * ticks[-1]:
+                    keep[idx] = False
+            ticks = ticks[keep]
+            ticks = list(ticks) + list(values)
+            return ticks, map("{:.2f}".format, ticks)
+
+        xs, ys = list(zip(*self.points)) if len(self.points) > 0 else ([], [])
+        plt.xticks(*gen_ticks(xs, ticks=self.xticks()), rotation=45)
+        plt.yticks(*gen_ticks(ys, ticks=self.yticks()))
+
+        # ax_top = self.ax.secondary_xaxis("top")
+        # ax_top.set_xticks(list(map(lambda x: round(x, 3), xs)))
+
+        # ax_right = self.ax.secondary_yaxis("right")
+        # ax_right.set_yticks(list(map(lambda x: round(x, 3), ys)))
 
     def next_color(self):
         return cfg.color_map[len(self.y_means)]

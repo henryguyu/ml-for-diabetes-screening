@@ -47,12 +47,20 @@ def pos_miss_curve(y_gt, probas_pred, *args, **kwargs):
     return np.r_[pos_rate[sl], 0], np.r_[miss_rate[sl], 1], thresholds[sl]
 
 
+def cost_curve(y_gt, probas_pred, test_name=None, test_value=None, *args, **kwargs):
+    if test_name is not None:
+        return cost_curve_with_test(
+            y_gt, probas_pred, test_name, test_value, *args, **kwargs
+        )
+    return cost_curve_without_FPG(y_gt, probas_pred, *args, **kwargs)
+
+
 def cost_curve_without_FPG(y_gt, probas_pred, *args, **kwargs):
     tps, fps, tns, fns, thresholds = binary_clf_curve(
         y_gt, probas_pred, *args, **kwargs
     )
 
-    costs = (tps + fps) * 60.95 / (fps[-1] + tps[-1])
+    costs = (tps + fps) * (27.5 + 33.45) / (fps[-1] + tps[-1])
     recall = tps / tps[-1]
     miss_rate = 1 - recall
 
@@ -63,16 +71,16 @@ def cost_curve_without_FPG(y_gt, probas_pred, *args, **kwargs):
     return costs[sl], miss_rate[sl], thresholds[sl]
 
 
-def cost_curve_with_FPG(y_gt, probas_pred, FPG, *args, **kwargs):
-    def _binary_clf_curve_with_FPG(y_gt, probas_pred, y_FPG):
+def cost_curve_with_test(y_gt, probas_pred, test_name, test_value, *args, **kwargs):
+    def _binary_clf_curve_with_test(y_gt, probas_pred, pos_by_test):
         y_gt = column_or_1d(y_gt)
         probas_pred = column_or_1d(probas_pred)
-        y_FPG = column_or_1d(y_FPG)
+        pos_by_test = column_or_1d(pos_by_test)
 
         desc_score_indices = np.argsort(probas_pred, kind="mergesort")[::-1]
         y_score = probas_pred[desc_score_indices]
         y_gt = y_gt[desc_score_indices]
-        y_FPG = y_FPG[desc_score_indices]
+        pos_by_test = pos_by_test[desc_score_indices]
 
         # y_score typically has many tied values. Here we extract
         # the indices associated with the distinct values. We also
@@ -83,19 +91,45 @@ def cost_curve_with_FPG(y_gt, probas_pred, FPG, *args, **kwargs):
         # accumulate the true positives with decreasing threshold
         tps = stable_cumsum(y_gt)[threshold_idxs]
         fps = 1 + threshold_idxs - tps
-        FPG_positives = stable_cumsum(y_FPG)[threshold_idxs]
-        return fps, tps, FPG_positives, y_score[threshold_idxs]
+        test_positives = stable_cumsum(pos_by_test)[threshold_idxs]
+        return fps, tps, test_positives, y_score[threshold_idxs]
 
-    y_FPG = (FPG >= 7).astype(int)
-    fps, tps, FPG_positives, thresholds = _binary_clf_curve_with_FPG(
-        y_gt, probas_pred, y_FPG, *args, **kwargs
+    if test_name == "FPG":
+        pos_by_test = test_value >= 7
+    elif test_name == "P2hPG":
+        pos_by_test = test_value >= 11.1
+    elif test_name == "HbA1c":
+        pos_by_test = test_value >= 6.5
+    else:
+        raise ValueError(test_name)
+
+    fps, tps, test_positives, thresholds = _binary_clf_curve_with_test(
+        y_gt, probas_pred, pos_by_test, *args, **kwargs
     )
     # tns = fps[-1] - fps
     # fns = tps[-1] - tps
     assert (fps[-1] + tps[-1]) == len(y_gt)
-    costs = (tps - FPG_positives + fps) * 51.06 / len(y_gt) + 18.19
+
+    n_total = fps[-1] + tps[-1]
+    n_pos = tps + fps
+    if test_name == "FPG":
+        costs = n_total * (8.3 + 9.89) + (n_pos - test_positives) * (23.56 + 27.5)
+    elif test_name == "P2hPG":
+        costs = n_total * (23.56 + 27.5) + (n_pos - test_positives) * (8.3 + 9.89)
+    elif test_name == "HbA1c":
+        costs = n_total * (8.3 + 84.16) + (n_pos - test_positives) * (33.45 + 27.5)
+    else:
+        raise ValueError(test_name)
+    costs /= n_total
+
     recall = tps / tps[-1]
     miss_rate = 1 - recall
+    # # tns = fps[-1] - fps
+    # # fns = tps[-1] - tps
+    # assert (fps[-1] + tps[-1]) == len(y_gt)
+    # costs = (tps - 2hPG_positives + fps) * 18.19 / len(y_gt) + 51.06
+    # recall = tps / tps[-1]
+    # miss_rate = 1 - recall
 
     # stop when full recall attained
     # and reverse the outputs so recall is decreasing

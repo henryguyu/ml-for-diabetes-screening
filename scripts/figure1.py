@@ -34,6 +34,8 @@ class auROCNonLab(ExpFigure):
             ylim=(0, 1),
             name=f"{name}. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
             color=color,
+            xlabel="False positive rate",
+            ylabel="True positive rate",
         )
         plot_range(x_base, y_lower, y_upper)
         self.y_means[name] = y_mean
@@ -87,6 +89,7 @@ exp.run("Top-20", "LightGBMModel", "top20_non_lab")
 exp.run("Top-15", "LightGBMModel", "top15_non_lab")
 exp.run("Top-10", "LightGBMModel", "top10_non_lab")
 exp.run("Top-5", "LightGBMModel", "top5_non_lab")
+exp.plot()
 
 # Random
 plot_curve(
@@ -113,6 +116,7 @@ exp.run("Top-20", "LightGBMModel", "top20_non_lab")
 exp.run("Top-15", "LightGBMModel", "top15_non_lab")
 exp.run("Top-10", "LightGBMModel", "top10_non_lab")
 exp.run("Top-5", "LightGBMModel", "top5_non_lab")
+exp.plot()
 
 # plt.legend(loc="upper right")
 
@@ -125,6 +129,20 @@ exp = auROCNonLab()
 exp.run("FPG Model", "LightGBMModel", "FPG")
 exp.run("2hPG Model", "LightGBMModel", "2hPG")
 exp.run("HbA1c Model", "LightGBMModel", "HbA1c")
+exp.plot()
+
+# Random
+plot_curve(
+    (0, 1),
+    (0, 1),
+    ylim=(0, 1),
+    xlabel="False positive rate",
+    ylabel="True positive rate",
+    color="navy",
+    lw=2,
+    linestyle="--",
+    name="Random",
+)
 
 exp.save("figure1_c")
 
@@ -135,8 +153,9 @@ exp = auPRNonLab()
 exp.run("FPG Model", "LightGBMModel", "FPG")
 exp.run("2hPG Model", "LightGBMModel", "2hPG")
 exp.run("HbA1c Model", "LightGBMModel", "HbA1c")
+exp.plot()
 
-exp.save("figure1_c")
+exp.save("figure1_d")
 
 
 # %%

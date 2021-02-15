@@ -16,7 +16,7 @@ def get_cv_preds(
     model_name="LightGBMModel",
     feat_collection="without_FPG",
     update=False,
-    out_FPG=False,
+    out_tests=False,
     resample_train=False,
 ):
     # Load data
@@ -36,14 +36,20 @@ def get_cv_preds(
 
     cv_ys_gt = [y[idx] for idx in cv_indices]
     cv_y_prob = list(zip(cv_ys_gt, cv_probs_pred))
-    if "FPG" in X:
-        FPG = [X["FPG"][idx] for idx in cv_indices]
-        for y_prob, subFPG in zip(cv_y_prob, FPG):
-            y_prob[1][subFPG >= 7] = 1000
 
-        if out_FPG:
-            return cv_y_prob, FPG
+    tests = {"FPG": 7, "P2hPG": 11.1, "HbA1c": 6.5}
+    for test_name, thresh in tests.items():
+        if test_name in X:
+            test_values = [X[test_name][idx] for idx in cv_indices]
+            if test_name != "HbA1c" or "ADA" in cfg.label_field:
+                for y_prob, subvalue in zip(cv_y_prob, test_values):
+                    y_prob[1][subvalue >= thresh] = 1000
+            break
+    else:
+        test_name, test_values = None, None
 
+    if out_tests:
+        return cv_y_prob, test_name, test_values
     return cv_y_prob
 
 
