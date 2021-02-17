@@ -5,7 +5,7 @@ import numpy as np
 
 from lxh_prediction import metric_utils
 from lxh_prediction.exp_utils import get_cv_preds
-from lxh_prediction.plot import plot_curve, plot_range, ExpFigure
+from lxh_prediction.plot import plot_curve, plot_range, ExpFigure, plt
 
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
@@ -118,7 +118,7 @@ exp.run("Top-10", "LightGBMModel", "top10_non_lab")
 exp.run("Top-5", "LightGBMModel", "top5_non_lab")
 exp.plot()
 
-# plt.legend(loc="upper right")
+plt.legend(loc="upper right")
 
 exp.save("figure1_b")
 

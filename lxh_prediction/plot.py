@@ -29,14 +29,14 @@ def plot_curve(
     plt.legend(loc="lower right")
 
 
-def plot_range(x, y_lower, y_upper, color="grey", alpha=0.2, **kwargs):
+def plot_range(x, y_lower, y_upper, color="grey", alpha=0.1, **kwargs):
     plt.fill_between(x, y_lower, y_upper, color=color, alpha=alpha, **kwargs)
 
 
 class ExpFigure:
     def __init__(self, figure=None):
         if figure is None:
-            self.fig = plt.figure(figsize=(6, 6))
+            self.fig = plt.figure(figsize=(7, 7))
             self.ax = self.fig.add_subplot(111)
         else:
             self.fig = figure.fig
@@ -74,8 +74,8 @@ class ExpFigure:
             return ticks, map("{:.2f}".format, ticks)
 
         xs, ys = list(zip(*self.points)) if len(self.points) > 0 else ([], [])
-        plt.xticks(*gen_ticks(xs, ticks=self.xticks()), rotation=45)
-        plt.yticks(*gen_ticks(ys, ticks=self.yticks()))
+        plt.xticks(*gen_ticks(xs, ticks=self.xticks()), rotation=45, fontsize=10)
+        plt.yticks(*gen_ticks(ys, ticks=self.yticks()), fontsize=10)
 
         # ax_top = self.ax.secondary_xaxis("top")
         # ax_top.set_xticks(list(map(lambda x: round(x, 3), xs)))
@@ -87,6 +87,8 @@ class ExpFigure:
         return cfg.color_map[len(self.y_means)]
 
     def save(self, name):
+        self.plot()
+
         x_means, y_means = self.x_means, self.y_means
         x_base, y_base = self.x_base, self.y_base
         df_ymeans = pd.DataFrame(y_means.values(), index=y_means.keys(), columns=x_base)
@@ -100,3 +102,7 @@ class ExpFigure:
         df_xmeans.to_csv(output)
 
         self.fig.savefig(os.path.join(cfg.root, f"data/results/{name}.pdf"))
+
+    def fname(self, name):
+        name = f"{name} Model" if "+" not in name else name
+        return name

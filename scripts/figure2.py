@@ -20,7 +20,7 @@ class auROCExp(ExpFigure):
         fpr = np.mean(probs[ys == 0] > 0)
         return tpr, fpr
 
-    def run(self, name, model, feat_collection):
+    def run(self, name, model, feat_collection, cutoff=False):
         cv_y_prob = get_cv_preds(
             model_name=model,
             feat_collection=feat_collection,
@@ -40,7 +40,7 @@ class auROCExp(ExpFigure):
             x_base,
             y_mean,
             ylim=(0, 1),
-            name=f"{name} Model. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+            name=f"{self.fname(name)}. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
             color=color,
             zorder=3,
         )
@@ -51,7 +51,7 @@ class auROCExp(ExpFigure):
         self.y_base, x_mean = metric_utils.mean_curve(tprs, fprs)[:2]
         self.x_means[name] = x_mean
 
-        if "LightGBMM" not in model:
+        if "LightGBMM" not in model and cutoff:
             tpr, fpr = self.mean_tpr_fpr(cv_y_prob)
             print(f"{name}: fpr: {fpr}, tpr: {tpr}")
             plt.axvline(x=fpr, c="gray", ls="--", lw=1, zorder=1)
@@ -76,7 +76,7 @@ class auPRExp(ExpFigure):
         recall = np.mean(probs[ys > 0] > 0)
         return precision, recall
 
-    def run(self, name, model, feat_collection):
+    def run(self, name, model, feat_collection, cutoff=False):
         cv_y_prob = get_cv_preds(
             model_name=model,
             feat_collection=feat_collection,
@@ -99,7 +99,7 @@ class auPRExp(ExpFigure):
             ylim=(0, 1),
             xlabel="Recall",
             ylabel="Precision",
-            name=f"{name} Model. auPR={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+            name=f"{self.fname(name)}. auPR={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
             color=color,
             zorder=3,
         )
@@ -111,7 +111,7 @@ class auPRExp(ExpFigure):
         self.y_base, x_mean = metric_utils.mean_curve(precisions, recalls)[:2]
         self.x_means[name] = x_mean
 
-        if "LightGBMM" not in model:
+        if "LightGBMM" not in model and cutoff:
             p, r = self.mean_precision_recall(cv_y_prob)
             print(f"{name}: precision: {p}, recall: {r}")
             plt.axvline(x=r, c="gray", ls="--", lw=1, zorder=1)
@@ -125,8 +125,9 @@ class auPRExp(ExpFigure):
 # %%
 # Figure 2c, ROC, ADA/CDS
 exp = auROCExp()
-exp.run("ADA", "ADAModel", "ADA")
-exp.run("CDS", "CHModel", "CH")
+exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
+exp.run("ADA", "ADAModel", "ADA", cutoff=True)
+exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 # Random
@@ -145,12 +146,12 @@ plot_curve(
 exp.save("figure2_c")
 
 
-# %%
 # Figure 2d, auPR, ADA/CDS
 
 exp = auPRExp()
-exp.run("ADA", "ADAModel", "ADA")
-exp.run("CDS", "CHModel", "CH")
+exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
+exp.run("ADA", "ADAModel", "ADA", cutoff=True)
+exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 plt.legend(loc="upper right")
@@ -158,12 +159,16 @@ exp.save("figure2_d")
 
 
 # %%
-# SFigure 2a auROC, ADA/CDS, FPG
+# Figure 2e auROC, ADA/CDS, FPG
 
 exp = auROCExp()
 exp.run("FPG", "LightGBMModel", "FPG")
-exp.run("ADA+FPG", "ADAModel", "ADA_FPG")
+exp.run("2hPG", "LightGBMModel", "2hPG")
+exp.run("HbA1c", "LightGBMModel", "HbA1c")
 exp.run("CDS+FPG", "CHModel", "CH_FPG")
+exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
+exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 # Random
@@ -179,18 +184,22 @@ plot_curve(
     name="Random",
 )
 
-exp.save("s_figure2_a")
+exp.save("figure2_e")
 # %%
-# SFigure 2b auPR, ADA/CDS, FPG
+# Figure 2f auPR, ADA/CDS, FPG
 
 exp = auPRExp()
 exp.run("FPG", "LightGBMModel", "FPG")
-exp.run("ADA+FPG", "ADAModel", "ADA_FPG")
+exp.run("2hPG", "LightGBMModel", "2hPG")
+exp.run("HbA1c", "LightGBMModel", "HbA1c")
 exp.run("CDS+FPG", "CHModel", "CH_FPG")
+exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
+exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 plt.legend(loc="upper left")
-exp.save("s_figure2_b")
+exp.save("figure2_f")
 
 
 # %%
