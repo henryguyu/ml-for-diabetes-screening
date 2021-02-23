@@ -20,7 +20,7 @@ class NeedsMissRateExp(ExpFigure):
         nag_rate = np.mean(probs <= 0)
         return 1 - nag_rate, miss_rate
 
-    def run(self, name, model, feat_collection):
+    def run(self, name, model, feat_collection, cutoff=False):
         cv_y_prob = get_cv_preds(
             model_name=model,
             feat_collection=feat_collection,
@@ -51,7 +51,7 @@ class NeedsMissRateExp(ExpFigure):
         self.y_base, x_mean = metric_utils.mean_curve(pos_rates, miss_rates)[:2]
         self.x_means[name] = x_mean
 
-        if "LightGBM" not in model:
+        if "LightGBM" not in model and cutoff:
             pos_rate, miss_rate = self.mean_pos_missrate(cv_y_prob)
             print(f"{name}: miss_rate: {miss_rate}, pos_rate: {pos_rate}")
             plt.axvline(x=miss_rate, c="gray", ls="--", lw=1, zorder=1)
@@ -85,7 +85,7 @@ class CostMissRateExp(ExpFigure):
     def yticks(self):
         return np.linspace(self.MinCost, self.MaxCost, 6)
 
-    def run(self, name, model, feat_collection):
+    def run(self, name, model, feat_collection, cutoff=False):
         cv_y_prob, test_name, test_values = get_cv_preds(
             model_name=model,
             feat_collection=feat_collection,
@@ -102,7 +102,10 @@ class CostMissRateExp(ExpFigure):
             )
         )
         x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
-            miss_rates, costs, y_range=(self.MinCost, self.MaxCost)
+            miss_rates,
+            costs,
+            y_range=(self.MinCost, self.MaxCost),
+            # num_x=int((self.MaxCost - self.MinCost) * 10),
         )
         color = self.next_color()
         plot_curve(
@@ -120,11 +123,15 @@ class CostMissRateExp(ExpFigure):
         self.x_base = x_base
 
         self.y_base, x_mean = metric_utils.mean_curve(
-            costs, miss_rates, x_range=(self.MinCost, self.MaxCost), reverse=True
+            costs,
+            miss_rates,
+            x_range=(self.MinCost, self.MaxCost),
+            num_x=int((self.MaxCost - self.MinCost) * 10),
+            reverse=True,
         )[:2]
         self.x_means[name] = x_mean
 
-        if "LightGBM" not in model:
+        if "LightGBM" not in model and cutoff:
             costs, miss_rate = self.mean_cost_missrate(
                 cv_y_prob, test_name, test_values
             )
@@ -145,17 +152,31 @@ class CostMissRateExp(ExpFigure):
 # %%
 # Figure 3a, needs of OGTT/Costs, ADA/CDS
 exp = NeedsMissRateExp()
+exp.run("FPG", "LightGBMModel", "FPG")
+exp.run("2hPG", "LightGBMModel", "2hPG")
+exp.run("HbA1c", "LightGBMModel", "HbA1c")
+exp.run("CDS+FPG", "CHModel", "CH_FPG", cutoff=True)
+exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
+exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
-exp.run("ADA", "ADAModel", "ADA")
-exp.run("CDS", "CHModel", "CH")
 exp.plot()
 exp.save("figure3_a-1")
 
 exp = CostMissRateExp()
+exp.MaxCost = 120
+
+# exp.MinCost = 45
+exp.run("FPG", "LightGBMModel", "FPG")
+exp.run("2hPG", "LightGBMModel", "2hPG")
+exp.run("HbA1c", "LightGBMModel", "HbA1c")
+exp.run("CDS+FPG", "CHModel", "CH_FPG", cutoff=True)
+exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
+exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
-exp.run("ADA", "ADAModel", "ADA")
-exp.run("CDS", "CHModel", "CH")
 exp.plot()
+plt.legend(loc="upper right")
 exp.save("figure3_a-2")
 
 # %%
