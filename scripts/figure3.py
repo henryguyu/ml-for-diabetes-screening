@@ -161,6 +161,7 @@ exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
 exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
 exp.plot()
+plt.legend(loc="upper right")
 exp.save("figure3_a-1")
 
 exp = CostMissRateExp()

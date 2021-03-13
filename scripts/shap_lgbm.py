@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import shap
+import os
 
 import lxh_prediction.config as cfg
 from lxh_prediction import data_utils, metric_utils
@@ -13,7 +14,7 @@ shap.initjs()
 
 # %%
 # Load data
-feat_collection = "full_non_lab"
+feat_collection = "top20_non_lab"
 X, y = data_utils.load_data(cfg.feature_fields[feat_collection])
 X_FPG, _ = data_utils.load_data(["FPG"])
 X_display = X
@@ -80,7 +81,7 @@ for ori, new in name_maps.items():
     feature_names[name_to_index[ori]] = new
 # %%
 # idx = X_hard.index[2]
-idx = TN[23]
+idx = TP[24]
 print(y.iloc[idx])
 shap.force_plot(
     expected_value,
@@ -119,8 +120,9 @@ def ABS_SHAP(df_shap, df):
     # Determine the correlation in order to plot with different colors
     corr_list = []
     for i in feature_list:
-        b = np.corrcoef(shap_v[i], df_v[i])[1][0]
-        corr_list.append(b)
+        b = np.corrcoef(shap_v[i], df_v[i])
+        print(b)
+        corr_list.append(b[1][0])
     corr_df = pd.concat([pd.Series(feature_list), pd.Series(corr_list)], axis=1).fillna(
         0
     )
@@ -135,14 +137,17 @@ def ABS_SHAP(df_shap, df):
     k2 = k.merge(corr_df, left_on="Variable", right_on="Variable", how="inner")
     k2 = k2.sort_values(by="SHAP_abs", ascending=True)
     k2 = k2.iloc[-20:]
+    k2["VarRenamed"] = [name_maps.get(name, name) for name in k2["Variable"]]
     colorlist = k2["Sign"]
     ax = k2.plot.barh(
         x="Variable", y="SHAP_abs", color=colorlist, figsize=(5, 6), legend=False
     )
     ax.set_xlabel("SHAP Value (Red = Positive Impact)")
+    return k2
 
 
-ABS_SHAP(shap_values, X)
+k2 = ABS_SHAP(shap_values, X)
+k2.to_csv(os.path.join(cfg.root, "data/results/shap_abs.csv"))
 
 # %%
 
@@ -163,9 +168,14 @@ phi0 = expected_value
 RR = sigmoid(shap_v + phi0) / sigmoid(phi0)
 
 # %%
-name = "wc"
+name = "Phone"
 shap.dependence_plot(
-    name, RR.values, X, display_features=X_display, interaction_index=None
+    name,
+    RR.values,
+    X,
+    display_features=X_display,
+    interaction_index="Age",
+    feature_names=feature_names,
 )
 
 # %%

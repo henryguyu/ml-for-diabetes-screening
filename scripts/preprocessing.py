@@ -10,7 +10,7 @@ from lxh_prediction import config as cfg
 
 # %%
 src_file = os.path.join(cfg.root, "data/missforest.2.csv")
-dst_file = os.path.join(cfg.root, "data/processed_data_0214.csv")
+dst_file = os.path.join(cfg.root, "data/processed_data_0214_origin.csv")
 df = pd.read_csv(src_file)
 for col in df.columns:
     df[col] = pd.to_numeric(df[col], errors="coerce")
