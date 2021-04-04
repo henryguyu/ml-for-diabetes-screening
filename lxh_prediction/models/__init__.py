@@ -6,6 +6,7 @@ from .lightgbm_model import LightGBMModel
 from .lr_model import LogisticRegressionModel
 from .pca_model import PCAModel
 from .svm_model import SVMModel
+from .random_forest_model import RandomForestModel
 
 __all__ = [
     "BaseModel",
@@ -14,6 +15,7 @@ __all__ = [
     "LogisticRegressionModel",
     "PCAModel",
     "SVMModel",
+    "RandomForestModel",
     "ADAModel",
     "CHModel",
 ]

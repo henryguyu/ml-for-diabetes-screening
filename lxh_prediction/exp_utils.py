@@ -6,7 +6,6 @@ from lxh_prediction import data_utils, metric_utils, models
 
 results = {}
 cache_file = os.path.join(cfg.root, "data/results.pk")
-results = {}
 if os.path.isfile(cache_file):
     with open(cache_file, "rb") as f:
         results = pickle.load(f)

@@ -4,7 +4,7 @@ from typing import Dict
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import preprocessing
 
 from .base_model import BaseModel
@@ -12,9 +12,14 @@ from .base_model import BaseModel
 logger = logging.getLogger(__name__)
 
 
-class LogisticRegressionModel(BaseModel):
+class RandomForestModel(BaseModel):
     def __init__(self, params: Dict = {}):
-        self.params = {"class_weight": "balanced"}
+        self.params = {
+            "class_weight": "balanced",
+            "n_estimators": 100,
+            "max_depth": 5,
+            "min_samples_leaf": 0.25,
+        }
         self.params.update(params)
         self.model = None
         self.scaler = None
@@ -26,12 +31,12 @@ class LogisticRegressionModel(BaseModel):
         X_valid: pd.DataFrame = None,
         y_valid: pd.DataFrame = None,
     ):
-        logger.info("Start LogisticRegression fit...")
+        logger.info("Start RandomForestClassifier fit...")
         self.scaler = preprocessing.StandardScaler().fit(X)
         X_scaled = self.scaler.transform(X)
 
-        self.model = LogisticRegression(**self.params).fit(X_scaled, y.to_numpy())
-        logger.info("End LogisticRegression fit")
+        self.model = RandomForestClassifier(**self.params).fit(X_scaled, y.to_numpy())
+        logger.info("End RandomForestClassifier fit")
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         assert self.model is not None

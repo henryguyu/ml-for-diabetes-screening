@@ -126,7 +126,7 @@ exp.save("figure1_b")
 # Figure 1c, ROC, full, top 5/10/15/20
 
 exp = auROCNonLab()
-#exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
+# exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
 exp.run("AI+FPG Model", "LightGBMModel", "FPG")
 exp.run("AI+2hPG Model", "LightGBMModel", "2hPG")
 exp.run("AI+HbA1c Model", "LightGBMModel", "HbA1c")
@@ -151,13 +151,37 @@ exp.save("figure1_c")
 # Figure 1d, auPR, full, top 5/10/15/20
 
 exp = auPRNonLab()
-#exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
+# exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
 exp.run("AI+FPG Model", "LightGBMModel", "FPG")
 exp.run("AI+2hPG Model", "LightGBMModel", "2hPG")
 exp.run("AI+HbA1c Model", "LightGBMModel", "HbA1c")
 exp.plot()
 
 exp.save("figure1_d")
+
+
+# %%
+
+exp = auROCNonLab()
+feature_set = "top20_non_lab"
+exp.run("Non-lab(LGBM)", "LightGBMModel", feature_set)
+exp.run("Non-lab(ANN)", "ANNModel", feature_set)
+exp.run("CDS", "CHModel", "CH")
+exp.run("Non-lab(LR) Model", "LogisticRegressionModel", feature_set)
+exp.run("Non-lab(SVM) Model", "SVMModel", feature_set)
+exp.run("Non-lab(RF) Model", "RandomForestModel", feature_set)
+exp.plot()
+exp.save("model_test_top20_auc")
+
+exp = auPRNonLab()
+exp.run("Non-lab(LGBM)", "LightGBMModel", feature_set)
+exp.run("Non-lab(ANN)", "ANNModel", feature_set)
+exp.run("CDS", "CHModel", "CH")
+exp.run("Non-lab(LR) Model", "LogisticRegressionModel", feature_set)
+exp.run("Non-lab(SVM) Model", "SVMModel", feature_set)
+exp.run("Non-lab(RF) Model", "RandomForestModel", feature_set)
+exp.plot()
+exp.save("model_test_top20_auPR")
 
 
 # %%
