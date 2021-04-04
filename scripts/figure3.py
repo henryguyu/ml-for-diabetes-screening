@@ -42,7 +42,7 @@ class NeedsMissRateExp(ExpFigure):
             color=color,
             zorder=3,
             xlabel="Prediction Miss rate",
-            ylabel="The Needs of OGTT",
+            ylabel="The Needs of comfirmatory test",
         )
         plot_range(x_base, y_lower, y_upper, zorder=2)
         self.y_means[name] = y_mean
@@ -152,14 +152,16 @@ class CostMissRateExp(ExpFigure):
 # %%
 # Figure 3a, needs of OGTT/Costs, ADA/CDS
 exp = NeedsMissRateExp()
-exp.run("FPG", "LightGBMModel", "FPG")
-exp.run("2hPG", "LightGBMModel", "2hPG")
-exp.run("HbA1c", "LightGBMModel", "HbA1c")
-exp.run("CDS+FPG", "CHModel", "CH_FPG", cutoff=True)
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+exp.run("Non-lab (AI)", "LightGBMModel", "top20_non_lab")
 exp.run("CDS", "CHModel", "CH", cutoff=True)
-exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
+exp.run("AI+FPG", "LightGBMModel", "FPG")
+exp.run("CDS+FPG", "CHModel", "CH_FPG", cutoff=True)
+exp.run("AI+2hPG", "LightGBMModel", "2hPG")
+exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
+exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
+exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+
+
 exp.plot()
 plt.legend(loc="upper right")
 exp.save("figure3_a-1")
@@ -168,14 +170,14 @@ exp = CostMissRateExp()
 exp.MaxCost = 120
 
 # exp.MinCost = 45
-exp.run("FPG", "LightGBMModel", "FPG")
-exp.run("2hPG", "LightGBMModel", "2hPG")
-exp.run("HbA1c", "LightGBMModel", "HbA1c")
-exp.run("CDS+FPG", "CHModel", "CH_FPG", cutoff=True)
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+exp.run("Non-lab (AI)", "LightGBMModel", "top20_non_lab")
 exp.run("CDS", "CHModel", "CH", cutoff=True)
-exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
+exp.run("AI+FPG", "LightGBMModel", "FPG")
+exp.run("CDS+FPG", "CHModel", "CH_FPG", cutoff=True)
+exp.run("AI+2hPG", "LightGBMModel", "2hPG")
+exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
+exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
+exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
 exp.plot()
 plt.legend(loc="upper right")
 exp.save("figure3_a-2")

@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import shap
+from shap.plots import _labels
 import os
 
 import lxh_prediction.config as cfg
@@ -81,13 +82,15 @@ for ori, new in name_maps.items():
     feature_names[name_to_index[ori]] = new
 # %%
 # idx = X_hard.index[2]
-idx = TP[24]
+idx = TP[50]
+# print(X_display.iloc[idx])
 print(y.iloc[idx])
 shap.force_plot(
-    expected_value,
+    thresh,
     shap_values[idx, :],
     X_display.iloc[idx, :],
     feature_names=feature_names,
+    
 )
 
 
@@ -168,14 +171,16 @@ phi0 = expected_value
 RR = sigmoid(shap_v + phi0) / sigmoid(phi0)
 
 # %%
-name = "Phone"
+name = "BMI"
+_labels.labels["VALUE_FOR"] = "Relative Risk for diabetes"
 shap.dependence_plot(
     name,
     RR.values,
     X,
     display_features=X_display,
-    interaction_index="Age",
+    interaction_index=None,
     feature_names=feature_names,
+    
 )
 
 # %%

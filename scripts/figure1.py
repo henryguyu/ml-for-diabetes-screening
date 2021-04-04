@@ -126,10 +126,10 @@ exp.save("figure1_b")
 # Figure 1c, ROC, full, top 5/10/15/20
 
 exp = auROCNonLab()
-exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
-exp.run("FPG Model", "LightGBMModel", "FPG")
-exp.run("2hPG Model", "LightGBMModel", "2hPG")
-exp.run("HbA1c Model", "LightGBMModel", "HbA1c")
+#exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
+exp.run("AI+FPG Model", "LightGBMModel", "FPG")
+exp.run("AI+2hPG Model", "LightGBMModel", "2hPG")
+exp.run("AI+HbA1c Model", "LightGBMModel", "HbA1c")
 exp.plot()
 
 # Random
@@ -151,10 +151,10 @@ exp.save("figure1_c")
 # Figure 1d, auPR, full, top 5/10/15/20
 
 exp = auPRNonLab()
-exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
-exp.run("FPG Model", "LightGBMModel", "FPG")
-exp.run("2hPG Model", "LightGBMModel", "2hPG")
-exp.run("HbA1c Model", "LightGBMModel", "HbA1c")
+#exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
+exp.run("AI+FPG Model", "LightGBMModel", "FPG")
+exp.run("AI+2hPG Model", "LightGBMModel", "2hPG")
+exp.run("AI+HbA1c Model", "LightGBMModel", "HbA1c")
 exp.plot()
 
 exp.save("figure1_d")
