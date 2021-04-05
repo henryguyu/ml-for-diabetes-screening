@@ -162,13 +162,14 @@ exp.save("figure2_d")
 # Figure 2e auROC, ADA/CDS, FPG
 
 exp = auROCExp()
+# exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
 exp.run("AI+FPG", "LightGBMModel", "FPG")
 exp.run("CDS+FPG", "CHModel", "CH_FPG")
-exp.run("AI+2hPG", "LightGBMModel", "2hPG")
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-exp.run("CDS", "CHModel", "CH", cutoff=True)
+# exp.run("AI+2hPG", "LightGBMModel", "2hPG")
+# exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
+# exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
+# exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+# exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 # Random
@@ -189,16 +190,17 @@ exp.save("figure2_e")
 # Figure 2f auPR, ADA/CDS, FPG
 
 exp = auPRExp()
+# exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
 exp.run("AI+FPG", "LightGBMModel", "FPG")
 exp.run("CDS+FPG", "CHModel", "CH_FPG")
-exp.run("AI+2hPG", "LightGBMModel", "2hPG")
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-exp.run("CDS", "CHModel", "CH", cutoff=True)
+# exp.run("AI+2hPG", "LightGBMModel", "2hPG")
+# exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
+# exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
+# exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+# exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
-plt.legend(loc="upper left")
+plt.legend(loc="uppser left")
 exp.save("figure2_f")
 
 
@@ -242,7 +244,7 @@ exp.save("s_figure2_d")
 # SFigure 2e auROC, ADA/CDS, HbA1c
 
 exp = auROCExp()
-exp.run("HbA1c Model", "LightGBMModel", "HbA1c")
+exp.run("HbA1c", "LightGBMModel", "HbA1c")
 exp.run("ADA+HbA1c", "ADAModel", "ADA_HbA1c")
 exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
 exp.plot()

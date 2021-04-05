@@ -85,6 +85,7 @@ class auPRNonLab(ExpFigure):
 # Figure 1a, ROC, full, top 5/10/15/20
 exp = auROCNonLab()
 exp.run("Full Model", "LightGBMModel", "full_non_lab")
+exp.run("Top-25", "LightGBMModel", "top25_non_lab")
 exp.run("Top-20", "LightGBMModel", "top20_non_lab")
 exp.run("Top-15", "LightGBMModel", "top15_non_lab")
 exp.run("Top-10", "LightGBMModel", "top10_non_lab")
@@ -112,6 +113,7 @@ exp.save("figure1_a")
 
 exp = auPRNonLab()
 exp.run("Full Model", "LightGBMModel", "full_non_lab")
+exp.run("Top-25", "LightGBMModel", "top25_non_lab")
 exp.run("Top-20", "LightGBMModel", "top20_non_lab")
 exp.run("Top-15", "LightGBMModel", "top15_non_lab")
 exp.run("Top-10", "LightGBMModel", "top10_non_lab")
@@ -173,6 +175,7 @@ exp.run("Non-lab(RF) Model", "RandomForestModel", feature_set)
 exp.plot()
 exp.save("model_test_top20_auc")
 
+# %%
 exp = auPRNonLab()
 exp.run("Non-lab(LGBM)", "LightGBMModel", feature_set)
 exp.run("Non-lab(ANN)", "ANNModel", feature_set)

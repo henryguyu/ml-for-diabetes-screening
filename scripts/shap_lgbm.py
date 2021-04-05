@@ -77,35 +77,32 @@ name_maps = {
     "frye0": "Fry",
     "ntime": "Naptime",
     "nigtime": "Nitime",
+    # "hypertension": "Hypertension",
 }
 for ori, new in name_maps.items():
     feature_names[name_to_index[ori]] = new
 # %%
 # idx = X_hard.index[2]
-idx = TP[50]
+idx = TN[55]
 # print(X_display.iloc[idx])
 print(y.iloc[idx])
 shap.force_plot(
-    thresh,
-    shap_values[idx, :],
-    X_display.iloc[idx, :],
-    feature_names=feature_names,
-    
+    thresh, shap_values[idx, :], X_display.iloc[idx, :], feature_names=feature_names,
 )
 
 
 # %%
 shap.summary_plot(
-    shap_values, X, plot_type="dot", feature_names=feature_names,
+    shap_values, X, max_display=20, plot_type="bar", feature_names=feature_names,
 )
 # %%
-name = "BMI"
+name = "lvigtime"
 shap.dependence_plot(
     name,
     shap_values,
     X,
     display_features=X_display,
-    interaction_index=None,
+    interaction_index="Age",
     feature_names=feature_names,
 )
 
@@ -124,7 +121,7 @@ def ABS_SHAP(df_shap, df):
     corr_list = []
     for i in feature_list:
         b = np.corrcoef(shap_v[i], df_v[i])
-        print(b)
+        # print(b)
         corr_list.append(b[1][0])
     corr_df = pd.concat([pd.Series(feature_list), pd.Series(corr_list)], axis=1).fillna(
         0
@@ -171,7 +168,7 @@ phi0 = expected_value
 RR = sigmoid(shap_v + phi0) / sigmoid(phi0)
 
 # %%
-name = "BMI"
+name = "HeavyPAday"
 _labels.labels["VALUE_FOR"] = "Relative Risk for diabetes"
 shap.dependence_plot(
     name,
@@ -180,7 +177,6 @@ shap.dependence_plot(
     display_features=X_display,
     interaction_index=None,
     feature_names=feature_names,
-    
 )
 
 # %%
