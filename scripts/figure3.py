@@ -1,5 +1,6 @@
 # %%
 import logging
+from matplotlib.pyplot import xlim
 
 import numpy as np
 
@@ -30,29 +31,34 @@ class NeedsMissRateExp(ExpFigure):
         pos_rates, miss_rates, _ = zip(
             *(metric_utils.pos_miss_curve(ys, probs) for ys, probs in cv_y_prob)
         )
+        miss_rates = 1 - np.asarray(miss_rates)
         x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
-            miss_rates, pos_rates
+            miss_rates, pos_rates, x_range=self.xlim, y_range=self.ylim, reverse=True
         )
         color = self.next_color()
         plot_curve(
             x_base,
             y_mean,
-            ylim=(0, 1),
-            name=f"{name} Model",
+            ylim=self.ylim,
+            xlim=self.xlim,
+            name=f"{name}",
             color=color,
             zorder=3,
-            xlabel="Prediction Miss rate",
-            ylabel="The Needs of comfirmatory test",
+            xlabel="Sensitivity",
+            ylabel="Proportion of requiring confirmatory test",
         )
         plot_range(x_base, y_lower, y_upper, zorder=2)
         self.y_means[name] = y_mean
         self.x_base = x_base
 
-        self.y_base, x_mean = metric_utils.mean_curve(pos_rates, miss_rates)[:2]
+        self.y_base, x_mean = metric_utils.mean_curve(
+            pos_rates, miss_rates, y_range=self.xlim, x_range=self.ylim,
+        )[:2]
         self.x_means[name] = x_mean
 
         if "LightGBM" not in model and cutoff:
             pos_rate, miss_rate = self.mean_pos_missrate(cv_y_prob)
+            miss_rate = 1 - miss_rate
             print(f"{name}: miss_rate: {miss_rate}, pos_rate: {pos_rate}")
             plt.axvline(x=miss_rate, c="gray", ls="--", lw=1, zorder=1)
             plt.axhline(y=pos_rate, c="gray", ls="--", lw=1, zorder=1)
@@ -68,9 +74,6 @@ class NeedsMissRateExp(ExpFigure):
 
 
 class CostMissRateExp(ExpFigure):
-    MaxCost = 65
-    MinCost = 0
-
     @staticmethod
     def mean_cost_missrate(cv_y_prob, test_name=None, test_values=None):
         ys = np.concatenate([y_prob[0] for y_prob in cv_y_prob])
@@ -81,9 +84,6 @@ class CostMissRateExp(ExpFigure):
             test_values = np.concatenate(test_values)
         cost, missrate, _ = metric_utils.cost_curve(ys, probs, test_name, test_values)
         return cost[-1], missrate[-1]
-
-    def yticks(self):
-        return np.linspace(self.MinCost, self.MaxCost, 6)
 
     def run(self, name, model, feat_collection, cutoff=False):
         cv_y_prob, test_name, test_values = get_cv_preds(
@@ -101,22 +101,26 @@ class CostMissRateExp(ExpFigure):
                 for i, (ys, probs) in enumerate(cv_y_prob)
             )
         )
+        miss_rates = 1 - np.asarray(miss_rates)
         x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
             miss_rates,
             costs,
-            y_range=(self.MinCost, self.MaxCost),
+            y_range=self.ylim,
+            x_range=self.xlim,
             # num_x=int((self.MaxCost - self.MinCost) * 10),
+            reverse=True,
         )
         color = self.next_color()
         plot_curve(
             x_base,
             y_mean,
-            ylim=(self.MinCost, self.MaxCost),
-            name=f"{name} Model",
+            ylim=self.ylim,
+            xlim=self.xlim,
+            name=f"{name}",
             color=color,
             zorder=3,
-            xlabel="Prediction Miss rate",
-            ylabel="Screening Costs",
+            xlabel="Sensitivity",
+            ylabel="Average screening Costs",
         )
         plot_range(x_base, y_lower, y_upper, zorder=2)
         self.y_means[name] = y_mean
@@ -125,8 +129,9 @@ class CostMissRateExp(ExpFigure):
         self.y_base, x_mean = metric_utils.mean_curve(
             costs,
             miss_rates,
-            x_range=(self.MinCost, self.MaxCost),
-            num_x=int((self.MaxCost - self.MinCost) * 10),
+            x_range=self.ylim,
+            y_range=self.xlim,
+            num_x=int((self.ylim[1] - self.ylim[0]) * 10),
             reverse=True,
         )[:2]
         self.x_means[name] = x_mean
@@ -135,6 +140,7 @@ class CostMissRateExp(ExpFigure):
             costs, miss_rate = self.mean_cost_missrate(
                 cv_y_prob, test_name, test_values
             )
+            miss_rate = 1 - miss_rate
             print(f"{name}: miss_rate: {miss_rate}, costs: {costs}")
             plt.axvline(x=miss_rate, c="gray", ls="--", lw=1, zorder=1)
             plt.axhline(y=costs, c="gray", ls="--", lw=1, zorder=1)
@@ -151,135 +157,41 @@ class CostMissRateExp(ExpFigure):
 
 # %%
 # Figure 3a, needs of OGTT/Costs, ADA/CDS
-exp = NeedsMissRateExp()
-exp.run("Non-lab (AI)", "LightGBMModel", "top20_non_lab")
-exp.run("CDS", "CHModel", "CH", cutoff=True)
-exp.run("AI+FPG", "LightGBMModel", "FPG")
-exp.run("CDS+FPG", "CHModel", "CH_FPG", cutoff=True)
-exp.run("AI+2hPG", "LightGBMModel", "2hPG")
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-
-
-exp.plot()
-plt.legend(loc="upper right")
-exp.save("figure3_a-1")
-
-exp = CostMissRateExp()
-exp.MaxCost = 70
-
-# exp.MinCost = 45
-# exp.run("Non-lab (AI)", "LightGBMModel", "top20_non_lab")
-# exp.run("CDS", "CHModel", "CH", cutoff=True)
-exp.run("AI+FPG", "LightGBMModel", "FPG")
-exp.run("CDS+FPG", "CHModel", "CH_FPG", cutoff=True)
-# exp.run("AI+2hPG", "LightGBMModel", "2hPG")
-# exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-# exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
-# exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-exp.plot()
-plt.legend(loc="upper right")
-exp.save("figure3_a-2")
-
-# %%
-# Figure 4a, needs of OGTT/Costs, ADA/CDS
 
 exp = NeedsMissRateExp()
-exp.run("FPG", "LightGBMModel", "FPG")
-exp.run("ADA+FPG", "ADAModel", "ADA_FPG")
-exp.run("CDS+FPG", "CHModel", "CH_FPG")
-exp.plot()
-exp.save("figure4_a-1")
 
+exp.xlim = (0, 1)
+# exp.run("ML Model", "LightGBMModel", "top20_non_lab")
+# exp.run("NCDRS", "CHModel", "CH", cutoff=True)
+# exp.run("ML+FPG Model", "LightGBMModel", "FPG")
+# exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG", cutoff=False)
+exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
+exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
+# exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
+# exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
+
+
+exp.plot()
+plt.legend(loc="lower right")
+exp.save("figure3j")
+
+#%% screeningecosts
 exp = CostMissRateExp()
-exp.run("FPG", "LightGBMModel", "FPG")
-exp.run("ADA+FPG", "ADAModel", "ADA_FPG")
-exp.run("CDS+FPG", "CHModel", "CH_FPG")
+exp.ylim = (90,150)
+exp.xlim = (00, 1)
+
+# exp.run("ML Model", "LightGBMModel", "top20_non_lab")
+# exp.run("NCDRS", "CHModel", "CH", cutoff=True)
+# exp.run("ML+FPG Model", "LightGBMModel", "FPG")
+# exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG", cutoff=False)
+# exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
+# exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
+exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
+exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
 exp.plot()
-exp.save("figure4_a-2")
-
-# %%
-# Figure 4b, needs of OGTT/Costs, ADA/CDS
-
-exp = NeedsMissRateExp()
-exp.run("2hPG", "LightGBMModel", "2hPG")
-exp.run("ADA+2hPG", "ADAModel", "ADA_2hPG")
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.plot()
-exp.save("figure4_b-1")
-
-exp = CostMissRateExp()
-exp.MaxCost = 70
-exp.MinCost = 45
-exp.run("2hPG", "LightGBMModel", "2hPG")
-exp.run("ADA+2hPG", "ADAModel", "ADA_2hPG")
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.plot()
-exp.save("figure4_b-2")
-
-# %%
-# Figure 4c, needs of OGTT/Costs, ADA/CDS
-
-exp = NeedsMissRateExp()
-exp.run("HbA1c", "LightGBMModel", "HbA1c")
-exp.run("ADA+HbA1c", "ADAModel", "ADA_HbA1c")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-exp.plot()
-exp.save("figure4_c-2")
-
-exp = CostMissRateExp()
-exp.MaxCost = 150
-exp.MinCost = 80
-exp.run("HbA1c", "LightGBMModel", "HbA1c")
-exp.run("ADA+HbA1c", "ADAModel", "ADA_HbA1c")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-exp.plot()
-exp.save("figure4_c-2")
+plt.legend(loc="lower right")
+exp.save("figure3k")
 
 # %%
 
-exp = NeedsMissRateExp()
-exp.run("Non-lab", "LightGBMModel", "top20_non_lab")
-exp.run("FPG", "LightGBMModel", "FPG")
-exp.run("2hPG", "LightGBMModel", "2hPG")
-exp.run("HbA1c", "LightGBMModel", "HbA1c")
-exp.run("ADA", "ADAModel", "ADA")
-exp.run("CDS", "CHModel", "CH")
-# exp.run("ADA+FPG", "ADAModel", "ADA_FPG")
-# exp.run("CDS+FPG", "CHModel", "CH_FPG")
-exp.plot()
-plt.legend(loc="upper right")
-exp.save("figure4_a-c-1")
 
-exp = CostMissRateExp()
-exp.MaxCost = 100
-# exp.MinCost = 80
-# exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
-exp.run("AI+FPG", "LightGBMModel", "FPG")
-# exp.run("AI+2hPG", "LightGBMModel", "2hPG")
-# exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
-# exp.run("ADA", "ADAModel", "ADA")
-# exp.run("CDS", "CHModel", "CH")
-# exp.run("ADA+FPG", "ADAModel", "ADA_FPG")
-exp.run("CDS+FPG", "CHModel", "CH_FPG")
-exp.plot()
-plt.legend(loc="upper right")
-exp.save("figure4_a-c-2")
-
-# exp = CostMissRateExp()
-# exp.run("ADA+FPG", "ADAModel", "ADA_FPG")
-# exp.run("CDS+FPG", "CHModel", "CH_FPG")
-# exp.run("AI+FPG", "LightGBMModel", "FPG")
-
-# exp = CostMissRateExp()
-# exp.run("ADA+2hPG", "ADAModel", "ADA_2hPG")
-# exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-# exp.run("2hPG", "LightGBMModel", "2hPG")
-
-# exp = CostMissRateExp()
-# exp.run("ADA+HbA1c", "ADAModel", "ADA_HbA1c")
-# exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-# exp.run("HbA1c", "LightGBMModel", "HbA1c")
-
-# %%

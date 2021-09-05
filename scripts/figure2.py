@@ -2,6 +2,7 @@
 import logging
 
 import numpy as np
+from brokenaxes import brokenaxes
 
 from lxh_prediction import metric_utils
 from lxh_prediction.exp_utils import get_cv_preds
@@ -34,21 +35,27 @@ class auROCExp(ExpFigure):
             [metric_utils.roc_auc_score(ys, probs) for ys, probs in cv_y_prob]
         )
         print(aucs)
-        x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(fprs, tprs)
+        x_base, y_mean, y_lower, y_upper = metric_utils.mean_curve(
+            fprs, tprs, x_range=self.xlim, y_range=self.ylim
+        )
         color = self.next_color()
         plot_curve(
             x_base,
             y_mean,
-            ylim=(0, 1),
-            name=f"{self.fname(name)}. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+            ylim=self.ylim,
+            xlim=self.xlim,
+            name=f"{self.fname(name)}={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
             color=color,
             zorder=3,
+            ax=self.ax,
         )
         plot_range(x_base, y_lower, y_upper, zorder=2)
         self.y_means[name] = y_mean
         self.x_base = x_base
+        self.y_base, x_mean = metric_utils.mean_curve(
+            tprs, fprs, x_range=self.ylim, y_range=self.xlim
+        )[:2]
 
-        self.y_base, x_mean = metric_utils.mean_curve(tprs, fprs)[:2]
         self.x_means[name] = x_mean
 
         if "LightGBMM" not in model and cutoff:
@@ -99,9 +106,10 @@ class auPRExp(ExpFigure):
             ylim=(0, 1),
             xlabel="Recall",
             ylabel="Precision",
-            name=f"{self.fname(name)}. auPR={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+            name=f"{self.fname(name)}={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
             color=color,
             zorder=3,
+            ax=self.ax,
         )
 
         plot_range(x_base, y_lower, y_upper, zorder=2)
@@ -124,10 +132,11 @@ class auPRExp(ExpFigure):
 
 # %%
 # Figure 2c, ROC, ADA/CDS
+# fig = plt.figure(figsize=(7, 7))
 exp = auROCExp()
-exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
-exp.run("ADA", "ADAModel", "ADA", cutoff=True)
-exp.run("CDS", "CHModel", "CH", cutoff=True)
+exp.run("ML Model", "LightGBMModel", "top20_non_lab")
+exp.run("ADART", "ADAModel", "ADA", cutoff=True)
+exp.run("NCDRS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 # Random
@@ -135,50 +144,56 @@ plot_curve(
     (0, 1),
     (0, 1),
     ylim=(0, 1),
-    xlabel="False positive rate",
-    ylabel="True positive rate",
+    xlabel="1-Specificity",
+    ylabel="Sensitivity",
     color="navy",
     lw=2,
     linestyle="--",
     name="Random",
 )
 
-exp.save("figure2_c")
+exp.save("figure3_b")
 
 
 # Figure 2d, auPR, ADA/CDS
 
 exp = auPRExp()
-exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
-exp.run("ADA", "ADAModel", "ADA", cutoff=True)
-exp.run("CDS", "CHModel", "CH", cutoff=True)
+exp.run("ML Model", "LightGBMModel", "top20_non_lab")
+exp.run("ADART", "ADAModel", "ADA", cutoff=True)
+exp.run("NCDRS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 plt.legend(loc="upper right")
-exp.save("figure2_d")
+exp.save("figure3_c")
 
 
 # %%
 # Figure 2e auROC, ADA/CDS, FPG
+# fig = plt.figure(figsize=(7, 7))
+# bax = brokenaxes(ylims=((0, 0.1), (0.5, 1)))
 
 exp = auROCExp()
-# exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
-exp.run("AI+FPG", "LightGBMModel", "FPG")
-exp.run("CDS+FPG", "CHModel", "CH_FPG")
-# exp.run("AI+2hPG", "LightGBMModel", "2hPG")
-# exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-# exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
-# exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+# exp.ylim = (0.5, 1)
+# exp.xlim = (0.5, 1)
+# exp.run("ML Model", "LightGBMModel", "top20_non_lab")
+exp.run("ML+FPG Model", "LightGBMModel", "FPG")
+exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG")
+# exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
+# exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
+# exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
+# exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
 # exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
+
 
 # Random
 plot_curve(
     (0, 1),
     (0, 1),
-    ylim=(0, 1),
-    xlabel="False positive rate",
-    ylabel="True positive rate",
+    xlim=exp.xlim,
+    ylim=exp.ylim,
+    xlabel="1-Specificity",
+    ylabel="Sensitivity",
     color="navy",
     lw=2,
     linestyle="--",
@@ -190,89 +205,17 @@ exp.save("figure2_e")
 # Figure 2f auPR, ADA/CDS, FPG
 
 exp = auPRExp()
-# exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
-exp.run("AI+FPG", "LightGBMModel", "FPG")
-exp.run("CDS+FPG", "CHModel", "CH_FPG")
-# exp.run("AI+2hPG", "LightGBMModel", "2hPG")
-# exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-# exp.run("AI+HbA1c", "LightGBMModel", "HbA1c")
-# exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
+# exp.run("ML Model", "LightGBMModel", "top20_non_lab")
+# exp.run("ML+FPG Model", "LightGBMModel", "FPG")
+# exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG")
+# exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
+# exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
+exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
+exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
 # exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
-plt.legend(loc="uppser left")
+plt.legend(loc="upper left")
 exp.save("figure2_f")
 
 
-# %%
-# SFigure 2c auROC, ADA/CDS, 2hPG
-
-exp = auROCExp()
-exp.run("2hPG", "LightGBMModel", "2hPG")
-exp.run("ADA+2hPG", "ADAModel", "ADA_2hPG")
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.plot()
-
-# Random
-plot_curve(
-    (0, 1),
-    (0, 1),
-    ylim=(0, 1),
-    xlabel="False positive rate",
-    ylabel="True positive rate",
-    color="navy",
-    lw=2,
-    linestyle="--",
-    name="Random",
-)
-
-exp.save("s_figure2_c")
-# %%
-# SFigure 2d auPR, ADA/CDS, 2hPG
-
-exp = auPRExp()
-exp.run("2hPG", "LightGBMModel", "2hPG")
-exp.run("ADA+2hPG", "ADAModel", "ADA_2hPG")
-exp.run("CDS+2hPG", "CHModel", "CH_2hPG")
-exp.plot()
-
-plt.legend(loc="upper left")
-exp.save("s_figure2_d")
-
-
-# %%
-# SFigure 2e auROC, ADA/CDS, HbA1c
-
-exp = auROCExp()
-exp.run("HbA1c", "LightGBMModel", "HbA1c")
-exp.run("ADA+HbA1c", "ADAModel", "ADA_HbA1c")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-exp.plot()
-
-# Random
-plot_curve(
-    (0, 1),
-    (0, 1),
-    ylim=(0, 1),
-    xlabel="False positive rate",
-    ylabel="True positive rate",
-    color="navy",
-    lw=2,
-    linestyle="--",
-    name="Random",
-)
-
-exp.save("s_figure2_e")
-# %%
-# SFigure 2f auPR, ADA/CDS, HbA1c
-
-exp = auPRExp()
-exp.run("HbA1c Model", "LightGBMModel", "HbA1c")
-exp.run("ADA+HbA1c", "ADAModel", "ADA_HbA1c")
-exp.run("CDS+HbA1c", "CHModel", "CH_HbA1c")
-exp.plot()
-
-plt.legend(loc="upper left")
-exp.save("s_figure2_f")
-
-# %%

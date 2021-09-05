@@ -47,22 +47,42 @@ def pos_miss_curve(y_gt, probas_pred, *args, **kwargs):
     return np.r_[pos_rate[sl], 0], np.r_[miss_rate[sl], 1], thresholds[sl]
 
 
-def cost_curve(y_gt, probas_pred, test_name=None, test_value=None, *args, **kwargs):
+def cost_curve(
+    y_gt,
+    probas_pred,
+    test_name=None,
+    test_value=None,
+    *args,
+    compare_to_all=False,
+    **kwargs
+):
     if test_name is not None:
         return cost_curve_with_test(
-            y_gt, probas_pred, test_name, test_value, *args, **kwargs
+            y_gt,
+            probas_pred,
+            test_name,
+            test_value,
+            *args,
+            compare_to_all=compare_to_all,
+            **kwargs
         )
-    return cost_curve_without_FPG(y_gt, probas_pred, *args, **kwargs)
+    return cost_curve_without_FPG(
+        y_gt, probas_pred, *args, compare_to_all=compare_to_all, **kwargs
+    )
 
 
-def cost_curve_without_FPG(y_gt, probas_pred, *args, **kwargs):
+def cost_curve_without_FPG(y_gt, probas_pred, *args, compare_to_all=False, **kwargs):
     tps, fps, tns, fns, thresholds = binary_clf_curve(
         y_gt, probas_pred, *args, **kwargs
     )
 
     costs = (tps + fps) * (27.5 + 33.45) / (fps[-1] + tps[-1])
-    recall = tps / tps[-1]
-    miss_rate = 1 - recall
+    # recall = tps / tps[-1]
+    # miss_rate = 1 - recall
+
+    n_total = fps[-1] + tps[-1]
+    fns = tps[-1] - tps
+    miss_rate = fns / (n_total if compare_to_all else tps[-1])
 
     # stop when full recall attained
     # and reverse the outputs so recall is decreasing
@@ -71,7 +91,9 @@ def cost_curve_without_FPG(y_gt, probas_pred, *args, **kwargs):
     return costs[sl], miss_rate[sl], thresholds[sl]
 
 
-def cost_curve_with_test(y_gt, probas_pred, test_name, test_value, *args, **kwargs):
+def cost_curve_with_test(
+    y_gt, probas_pred, test_name, test_value, *args, compare_to_all=False, **kwargs
+):
     def _binary_clf_curve_with_test(y_gt, probas_pred, pos_by_test):
         y_gt = column_or_1d(y_gt)
         probas_pred = column_or_1d(probas_pred)
@@ -122,8 +144,12 @@ def cost_curve_with_test(y_gt, probas_pred, test_name, test_value, *args, **kwar
         raise ValueError(test_name)
     costs /= n_total
 
-    recall = tps / tps[-1]
-    miss_rate = 1 - recall
+    # recall = tps / tps[-1]
+    # miss_rate = 1 - recall
+
+    fns = tps[-1] - tps
+    miss_rate = fns / (n_total if compare_to_all else tps[-1])
+
     # # tns = fps[-1] - fps
     # # fns = tps[-1] - tps
     # assert (fps[-1] + tps[-1]) == len(y_gt)

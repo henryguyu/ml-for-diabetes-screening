@@ -32,7 +32,7 @@ class auROCNonLab(ExpFigure):
             x_base,
             y_mean,
             ylim=(0, 1),
-            name=f"{name}. auROC={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
+            name=f"{name}={aucs.mean():.3f} [{aucs.min():.3f}, {aucs.max():.3f}]",
             color=color,
             xlabel="False positive rate",
             ylabel="True positive rate",
@@ -69,7 +69,7 @@ class auPRNonLab(ExpFigure):
             ylim=(0, 1),
             xlabel="Recall",
             ylabel="Precision",
-            name=f"{name}. auPR={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
+            name=f"{name}={aps.mean():.3f} [{aps.min():.3f}, {aps.max():.3f}]",
             color=color,
         )
 
@@ -85,11 +85,11 @@ class auPRNonLab(ExpFigure):
 # Figure 1a, ROC, full, top 5/10/15/20
 exp = auROCNonLab()
 exp.run("Full Model", "LightGBMModel", "full_non_lab")
-exp.run("Top-25", "LightGBMModel", "top25_non_lab")
-exp.run("Top-20", "LightGBMModel", "top20_non_lab")
-exp.run("Top-15", "LightGBMModel", "top15_non_lab")
-exp.run("Top-10", "LightGBMModel", "top10_non_lab")
-exp.run("Top-5", "LightGBMModel", "top5_non_lab")
+exp.run("Top-25 Model", "LightGBMModel", "top25_non_lab")
+exp.run("Top-20 Model", "LightGBMModel", "top20_non_lab")
+exp.run("Top-15 Model", "LightGBMModel", "top15_non_lab")
+exp.run("Top-10 Model", "LightGBMModel", "top10_non_lab")
+exp.run("Top-5 Model", "LightGBMModel", "top5_non_lab")
 exp.plot()
 
 # Random
@@ -97,15 +97,15 @@ plot_curve(
     (0, 1),
     (0, 1),
     ylim=(0, 1),
-    xlabel="False positive rate",
-    ylabel="True positive rate",
+    xlabel="1-Specificity",
+    ylabel="Sensitivity",
     color="navy",
     lw=2,
     linestyle="--",
     name="Random",
 )
 
-exp.save("figure1_a")
+exp.save("figure1_c")
 
 
 # %%
@@ -113,16 +113,16 @@ exp.save("figure1_a")
 
 exp = auPRNonLab()
 exp.run("Full Model", "LightGBMModel", "full_non_lab")
-exp.run("Top-25", "LightGBMModel", "top25_non_lab")
-exp.run("Top-20", "LightGBMModel", "top20_non_lab")
-exp.run("Top-15", "LightGBMModel", "top15_non_lab")
-exp.run("Top-10", "LightGBMModel", "top10_non_lab")
-exp.run("Top-5", "LightGBMModel", "top5_non_lab")
+exp.run("Top-25 Model", "LightGBMModel", "top25_non_lab")
+exp.run("Top-20 Model", "LightGBMModel", "top20_non_lab")
+exp.run("Top-15 Model", "LightGBMModel", "top15_non_lab")
+exp.run("Top-10 Model", "LightGBMModel", "top10_non_lab")
+exp.run("Top-5 Model", "LightGBMModel", "top5_non_lab")
 exp.plot()
 
 plt.legend(loc="upper right")
 
-exp.save("figure1_b")
+exp.save("figure1_d")
 
 # %%
 # Figure 1c, ROC, full, top 5/10/15/20

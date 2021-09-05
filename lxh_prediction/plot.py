@@ -17,9 +17,14 @@ def plot_curve(
     title=None,
     color="darkorange",
     lw=2,
+    ax=None,
     **kwargs,
-):
-    plt.plot(x, y, color=color, lw=lw, label=name, **kwargs)
+): 
+    ax = ax or plt
+    if name:
+        ax.plot(x, y, color=color, lw=lw, label=name, **kwargs)
+    else:
+        ax.plot(x, y, color=color, lw=lw, **kwargs)
     plt.xlim(xlim or plt.xlim())
     plt.ylim(ylim or plt.ylim())
     plt.xlabel(xlabel, fontdict={"size": 12})
@@ -34,13 +39,18 @@ def plot_range(x, y_lower, y_upper, color="grey", alpha=0.1, **kwargs):
 
 
 class ExpFigure:
-    def __init__(self, figure=None):
+    xlim = (0, 1)
+    ylim = (0, 1)
+
+    def __init__(self, figure=None, ax=None):
         if figure is None:
             self.fig = plt.figure(figsize=(7, 7))
-            self.ax = self.fig.add_subplot(111)
+            self.ax = ax or self.fig.add_subplot(111)
         else:
-            self.fig = figure.fig
-            self.ax = figure.ax
+            # self.fig = figure.fig
+            self.fig = figure
+            self.ax = ax or figure.ax
+        
         self.y_means = {}
         self.x_means = {}
         self.x_base = None
@@ -55,10 +65,10 @@ class ExpFigure:
         self.points.append((x, y))
 
     def xticks(self):
-        return np.linspace(0, 1, 6)
+        return np.linspace(*self.xlim, 6)
 
     def yticks(self):
-        return np.linspace(0, 1, 6)
+        return np.linspace(*self.ylim, 6)
 
     def plot(self):
         def gen_ticks(values, ticks):
@@ -67,6 +77,7 @@ class ExpFigure:
                 dists = np.abs(ticks - v)
                 print(v)
                 idx = np.argmin(dists)
+                print(v, dists[idx], 0.05 * ticks[-1])
                 if dists[idx] < 0.05 * ticks[-1]:
                     keep[idx] = False
             ticks = ticks[keep]
@@ -74,6 +85,8 @@ class ExpFigure:
             return ticks, map("{:.2f}".format, ticks)
 
         xs, ys = list(zip(*self.points)) if len(self.points) > 0 else ([], [])
+        xs = set(filter(lambda x: x is not None, xs))
+        ys = set(filter(lambda x: x is not None, ys))
         plt.xticks(*gen_ticks(xs, ticks=self.xticks()), rotation=45, fontsize=10)
         plt.yticks(*gen_ticks(ys, ticks=self.yticks()), fontsize=10)
 
@@ -104,5 +117,5 @@ class ExpFigure:
         self.fig.savefig(os.path.join(cfg.root, f"data/results/{name}.pdf"))
 
     def fname(self, name):
-        name = f"{name} Model" if "+" not in name else name
+        # name = f"{name} Model" if "+" not in name else name
         return name

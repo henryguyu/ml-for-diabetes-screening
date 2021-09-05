@@ -36,7 +36,7 @@ print(precisions[idx], recalls[idx], threshs[idx])
 thresh = threshs[idx]
 index = y_test.index
 
-preds = preds.iloc[:, 0] >= thresh
+preds = preds.iloc[:, 0]
 TP = index[(preds >= thresh) & (y_test > 0)]
 FP = index[(preds >= thresh) & (y_test == 0)]
 TN = index[(preds < thresh) & (y_test == 0)]
@@ -61,34 +61,44 @@ expected_value = explainer.expected_value[1]
 feature_names = list(X.columns)
 name_to_index = {name: i for i, name in enumerate(feature_names)}
 name_maps = {
-    "Ahr": "Rhr",
+    "Ahr": "PRP",
     "age": "Age",
     "lwork": "Work",
     "wc": "WC",
     "culutrue": "Education",
-    "lusephy": "Phone",
+    "lusephy": "Years of cellphone use",
     "ASBP": "SBP",
     "ADBP": "DBP",
-    "lgetup": "Getuptime",
+    "lgetup": "Wake time",
     "hc": "HC",
-    "lvigday": "HeavyPAday",
-    "lvighour": "HeavyPAhour",
+    "lvigday": "Days of vigorous activity",
+    "lvighour": "Hours of vigorous activity",
     "ldrinking": "Drinking",
-    "frye0": "Fry",
-    "ntime": "Naptime",
-    "nigtime": "Nitime",
+    "frye0": "Fried food",
+    "ntime": "Daytime sleep duration",
+    "nigtime": "Nighttime sleep duration",
     # "hypertension": "Hypertension",
 }
 for ori, new in name_maps.items():
     feature_names[name_to_index[ori]] = new
 # %%
 # idx = X_hard.index[2]
-idx = TN[55]
+idx = TP[37]
 # print(X_display.iloc[idx])
-print(y.iloc[idx])
-shap.force_plot(
-    thresh, shap_values[idx, :], X_display.iloc[idx, :], feature_names=feature_names,
+print(y.loc[idx], preds.loc[idx])
+# shap.force_plot(
+#     thresh, shap_values[idx, :], X_display.iloc[idx, :], feature_names=feature_names,
+# )
+
+base_value = min(shap_values[TP].sum(1).min(), shap_values[FP].sum(1).min())
+shape_value_exp = shap.Explanation(
+    shap_values[idx],
+    base_values=base_value,
+    data=X_display.loc[idx, :],
+    feature_names=feature_names,
 )
+
+shap.waterfall_plot(shape_value_exp)
 
 
 # %%
@@ -180,7 +190,6 @@ shap.dependence_plot(
 )
 
 # %%
-
 from scipy.stats import binned_statistic
 
 name = "wc"
