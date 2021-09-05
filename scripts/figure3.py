@@ -1,6 +1,5 @@
 # %%
 import logging
-from matplotlib.pyplot import xlim
 
 import numpy as np
 
@@ -177,7 +176,7 @@ exp.save("figure3j")
 
 #%% screeningecosts
 exp = CostMissRateExp()
-exp.ylim = (90,150)
+exp.ylim = (90, 150)
 exp.xlim = (00, 1)
 
 # exp.run("ML Model", "LightGBMModel", "top20_non_lab")
@@ -193,5 +192,4 @@ plt.legend(loc="lower right")
 exp.save("figure3k")
 
 # %%
-
 

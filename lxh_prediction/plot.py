@@ -19,7 +19,7 @@ def plot_curve(
     lw=2,
     ax=None,
     **kwargs,
-): 
+):
     ax = ax or plt
     if name:
         ax.plot(x, y, color=color, lw=lw, label=name, **kwargs)
@@ -43,14 +43,9 @@ class ExpFigure:
     ylim = (0, 1)
 
     def __init__(self, figure=None, ax=None):
-        if figure is None:
-            self.fig = plt.figure(figsize=(7, 7))
-            self.ax = ax or self.fig.add_subplot(111)
-        else:
-            # self.fig = figure.fig
-            self.fig = figure
-            self.ax = ax or figure.ax
-        
+        self.fig = figure or plt.figure(figsize=(4, 4), dpi=300)
+        self.ax = ax or self.fig.add_subplot(111)
+
         self.y_means = {}
         self.x_means = {}
         self.x_base = None
@@ -114,7 +109,7 @@ class ExpFigure:
         os.makedirs(os.path.dirname(output), exist_ok=True)
         df_xmeans.to_csv(output)
 
-        self.fig.savefig(os.path.join(cfg.root, f"data/results/{name}.pdf"))
+        self.fig.savefig(os.path.join(cfg.root, f"data/results/{name}.png"), dpi=300)
 
     def fname(self, name):
         # name = f"{name} Model" if "+" not in name else name

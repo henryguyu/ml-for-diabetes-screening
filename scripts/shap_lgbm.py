@@ -1,4 +1,5 @@
 # %%
+from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 import shap
@@ -15,7 +16,7 @@ shap.initjs()
 
 # %%
 # Load data
-feat_collection = "top20_non_lab"
+feat_collection = "full_non_lab"
 X, y = data_utils.load_data(cfg.feature_fields[feat_collection])
 X_FPG, _ = data_utils.load_data(["FPG"])
 X_display = X
@@ -61,7 +62,7 @@ expected_value = explainer.expected_value[1]
 feature_names = list(X.columns)
 name_to_index = {name: i for i, name in enumerate(feature_names)}
 name_maps = {
-    "Ahr": "PRP",
+    "Ahr": "RPR",
     "age": "Age",
     "lwork": "Work",
     "wc": "WC",
@@ -98,10 +99,12 @@ shape_value_exp = shap.Explanation(
     feature_names=feature_names,
 )
 
+fig = plt.figure(figsize=(6, 6), dpi=300)
 shap.waterfall_plot(shape_value_exp)
 
 
 # %%
+fig = plt.figure(figsize=(5, 5), dpi=300)
 shap.summary_plot(
     shap_values, X, max_display=20, plot_type="bar", feature_names=feature_names,
 )
@@ -178,8 +181,10 @@ phi0 = expected_value
 RR = sigmoid(shap_v + phi0) / sigmoid(phi0)
 
 # %%
-name = "HeavyPAday"
+name = "Age"
 _labels.labels["VALUE_FOR"] = "Relative Risk for diabetes"
+
+fig = plt.figure(figsize=(5, 5), dpi=300)
 shap.dependence_plot(
     name,
     RR.values,
@@ -187,6 +192,7 @@ shap.dependence_plot(
     display_features=X_display,
     interaction_index=None,
     feature_names=feature_names,
+    ax=fig.gca(),
 )
 
 # %%
