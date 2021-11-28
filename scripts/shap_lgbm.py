@@ -16,7 +16,7 @@ shap.initjs()
 
 # %%
 # Load data
-feat_collection = "full_non_lab"
+feat_collection = "top20_non_lab"
 X, y = data_utils.load_data(cfg.feature_fields[feat_collection])
 X_FPG, _ = data_utils.load_data(["FPG"])
 X_display = X
@@ -84,7 +84,7 @@ for ori, new in name_maps.items():
     feature_names[name_to_index[ori]] = new
 # %%
 # idx = X_hard.index[2]
-idx = TP[37]
+idx = TN[76]
 # print(X_display.iloc[idx])
 print(y.loc[idx], preds.loc[idx])
 # shap.force_plot(
@@ -104,7 +104,7 @@ shap.waterfall_plot(shape_value_exp)
 
 
 # %%
-fig = plt.figure(figsize=(5, 5), dpi=300)
+fig = plt.figure(figsize=(4, 4), dpi=300)
 shap.summary_plot(
     shap_values, X, max_display=20, plot_type="bar", feature_names=feature_names,
 )
@@ -181,10 +181,11 @@ phi0 = expected_value
 RR = sigmoid(shap_v + phi0) / sigmoid(phi0)
 
 # %%
-name = "Age"
+name = "WHtR"
 _labels.labels["VALUE_FOR"] = "Relative Risk for diabetes"
 
-fig = plt.figure(figsize=(5, 5), dpi=300)
+fig = plt.figure(figsize=(4, 4), dpi=300)
+plt.xlim((0.3, 0.8))
 shap.dependence_plot(
     name,
     RR.values,

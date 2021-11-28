@@ -133,10 +133,10 @@ class auPRExp(ExpFigure):
 # %%
 # Figure 2c, ROC, ADA/CDS
 # fig = plt.figure(figsize=(7, 7))
-exp = auROCExp()
+exp = auROCExp(plt.figure(figsize=(6, 6), dpi=300))
 exp.run("ML Model", "LightGBMModel", "top20_non_lab")
-exp.run("ADART", "ADAModel", "ADA", cutoff=True)
-exp.run("NCDRS", "CHModel", "CH", cutoff=True)
+# exp.run("ADART", "ADAModel", "ADA", cutoff=True)
+# exp.run("NCDRS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 # Random
@@ -157,10 +157,10 @@ exp.save("figure3_b")
 
 # Figure 2d, auPR, ADA/CDS
 
-exp = auPRExp()
+exp = auPRExp(plt.figure(figsize=(6, 6), dpi=300))
 exp.run("ML Model", "LightGBMModel", "top20_non_lab")
-exp.run("ADART", "ADAModel", "ADA", cutoff=True)
-exp.run("NCDRS", "CHModel", "CH", cutoff=True)
+# exp.run("ADART", "ADAModel", "ADA", cutoff=True)
+# exp.run("NCDRS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
 plt.legend(loc="upper right")
@@ -172,16 +172,16 @@ exp.save("figure3_c")
 # fig = plt.figure(figsize=(7, 7))
 # bax = brokenaxes(ylims=((0, 0.1), (0.5, 1)))
 
-exp = auROCExp()
+exp = auROCExp(plt.figure(figsize=(6, 6), dpi=300))
 # exp.ylim = (0.5, 1)
 # exp.xlim = (0.5, 1)
 # exp.run("ML Model", "LightGBMModel", "top20_non_lab")
-exp.run("ML+FPG Model", "LightGBMModel", "FPG")
-exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG")
+# exp.run("ML+FPG Model", "LightGBMModel", "FPG")
+# exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG")
 # exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
 # exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
-# exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
-# exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
+exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
+exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
 # exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
@@ -204,7 +204,7 @@ exp.save("figure2_e")
 # %%
 # Figure 2f auPR, ADA/CDS, FPG
 
-exp = auPRExp()
+exp = auPRExp(plt.figure(figsize=(6, 6), dpi=300))
 # exp.run("ML Model", "LightGBMModel", "top20_non_lab")
 # exp.run("ML+FPG Model", "LightGBMModel", "FPG")
 # exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG")
@@ -215,7 +215,9 @@ exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
 # exp.run("CDS", "CHModel", "CH", cutoff=True)
 exp.plot()
 
-plt.legend(loc="upper left")
+plt.legend(loc="lower left")
 exp.save("figure2_f")
 
 
+
+# %%

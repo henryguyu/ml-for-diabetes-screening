@@ -44,7 +44,7 @@ class NeedsMissRateExp(ExpFigure):
             color=color,
             zorder=3,
             xlabel="Sensitivity",
-            ylabel="Proportion of requiring confirmatory test",
+            ylabel="Proportion requiring confirmatory test",
         )
         plot_range(x_base, y_lower, y_upper, zorder=2)
         self.y_means[name] = y_mean
@@ -164,31 +164,31 @@ exp.xlim = (0, 1)
 # exp.run("NCDRS", "CHModel", "CH", cutoff=True)
 # exp.run("ML+FPG Model", "LightGBMModel", "FPG")
 # exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG", cutoff=False)
-exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
-exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
-# exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
-# exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
+# exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
+# exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
+exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
+exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
 
 
 exp.plot()
-plt.legend(loc="lower right")
+plt.legend(loc="upper right")
 exp.save("figure3j")
 
 #%% screeningecosts
 exp = CostMissRateExp()
 exp.ylim = (90, 150)
-exp.xlim = (00, 1)
+exp.xlim = (0, 1)
 
-# exp.run("ML Model", "LightGBMModel", "top20_non_lab")
-# exp.run("NCDRS", "CHModel", "CH", cutoff=True)
+exp.run("ML Model", "LightGBMModel", "top20_non_lab")
+exp.run("NCDRS", "CHModel", "CH", cutoff=True)
 # exp.run("ML+FPG Model", "LightGBMModel", "FPG")
 # exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG", cutoff=False)
 # exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
 # exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
-exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
-exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
+# exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
+# exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
 exp.plot()
-plt.legend(loc="lower right")
+plt.legend(loc="upper right")
 exp.save("figure3k")
 
 # %%

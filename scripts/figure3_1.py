@@ -113,18 +113,18 @@ class SensitivityCostExp(ExpFigure):
 
 #%%
 exp = SensitivityCostExp()
-exp.xlim = (18.19, 65)
-exp.ylim = (0.5, 1)
+exp.xlim = (93, 150)
+exp.ylim = (0, 1)
 
 # exp.MinCost = 45
 # exp.run("ML Model", "LightGBMModel", "top20_non_lab")
 # exp.run("NCDRS", "CHModel", "CH", cutoff=True)
-exp.run("ML+FPG Model", "LightGBMModel", "FPG")
-exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG")
+# exp.run("ML+FPG Model", "LightGBMModel", "FPG")
+# exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG")
 # exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
 # exp.run("NCDRS+2hPG Model", "CHModel", "CH_2hPG")
-# exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
-# exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
+exp.run("ML+HbA1c Model", "LightGBMModel", "HbA1c")
+exp.run("NCDRS+HbA1c Model", "CHModel", "CH_HbA1c")
 exp.plot()
 plt.legend(loc="lower right")
 exp.save("figure3_a-2")
@@ -183,7 +183,7 @@ class FutureCostExp(ExpFigure):
             color=color,
             zorder=3,
             xlabel="Average screening Costs",
-            ylabel="Average future Costs",
+            ylabel="Average costs of potential complications",
         )
 
         x_base, y_mean_high, y_lower, y_upper = metric_utils.mean_curve(
@@ -202,7 +202,7 @@ class FutureCostExp(ExpFigure):
             color=color,
             zorder=3,
             xlabel="Average screening Costs",
-            ylabel="Average future Costs",
+            ylabel="Average costs of potential complications",
         )
 
         # print(y_lower)
@@ -231,7 +231,7 @@ exp.ylim = (0, 600)
 
 # exp.MinCost = 45
 # exp.run("ML Model", "LightGBMModel", "top20_non_lab")
-# # exp.run("NCDRS", "CHModel", "CH", cutoff=True)
+# exp.run("NCDRS", "CHModel", "CH", cutoff=True)
 # exp.run("ML+FPG Model", "LightGBMModel", "FPG")
 # exp.run("NCDRS+FPG Model", "CHModel", "CH_FPG")
 # exp.run("ML+2hPG Model", "LightGBMModel", "2hPG")
