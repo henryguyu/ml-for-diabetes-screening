@@ -7,6 +7,7 @@ from .lr_model import LogisticRegressionModel
 from .pca_model import PCAModel
 from .svm_model import SVMModel
 from .random_forest_model import RandomForestModel
+from .gluon_model import AutoGluonModel
 
 __all__ = [
     "BaseModel",
@@ -18,4 +19,5 @@ __all__ = [
     "RandomForestModel",
     "ADAModel",
     "CHModel",
+    "AutoGluonModel",
 ]

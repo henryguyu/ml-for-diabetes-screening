@@ -38,7 +38,9 @@ def train(feat_collection="without_FPG", model_name="LightGBMModel"):
     # cv_aucs, cv_probs_pred, cv_indices = model.cross_validate(
     #     X, y, metric_fn=metric_utils.roc_auc_score
     # )
+    print(X_test)
     probs_pred = model.predict(X_test)
+    print(probs_pred)
 
     if "FPG" not in X:
         costs, miss_rate, _ = metric_utils.cost_curve_without_FPG(y_test, probs_pred)
@@ -55,37 +57,37 @@ def train(feat_collection="without_FPG", model_name="LightGBMModel"):
         title="Cost vs Miss rate",
     )
 
-    nag_rate, miss_rate, _ = metric_utils.nag_miss_curve(y_test, probs_pred)
-    plot_curve(
-        miss_rate,
-        nag_rate,
-        xlabel="Prediction miss rate",
-        ylabel="Patients avoiding examination",
-        # subline=((0, 1), (0, 1)),
-        title="Avoid test vs Miss rate"
-    )
+    # nag_rate, miss_rate, _ = metric_utils.nag_miss_curve(y_test, probs_pred)
+    # plot_curve(
+    #     miss_rate,
+    #     nag_rate,
+    #     xlabel="Prediction miss rate",
+    #     ylabel="Patients avoiding examination",
+    #     # subline=((0, 1), (0, 1)),
+    #     title="Avoid test vs Miss rate"
+    # )
 
-    precision, recall, _ = metric_utils.precision_recall_curve(y_test, probs_pred)
-    plot_curve(
-        recall,
-        precision,
-        xlabel="Reccall",
-        ylabel="Precision",
-        # subline=((0, 1), (0, 1)),
-        title="Precision vs Recall",
-    )
+    # precision, recall, _ = metric_utils.precision_recall_curve(y_test, probs_pred)
+    # plot_curve(
+    #     recall,
+    #     precision,
+    #     xlabel="Reccall",
+    #     ylabel="Precision",
+    #     # subline=((0, 1), (0, 1)),
+    #     title="Precision vs Recall",
+    # )
 
-    roc_auc = metric_utils.roc_auc_score(y_test, probs_pred)
-    fpr, tpr, _ = metric_utils.roc_curve(y_test, probs_pred)
-    plot_curve(
-        fpr,
-        tpr,
-        name="ROC curve (area = %0.2f)" % roc_auc,
-        xlabel="False positive rate",
-        ylabel="True positive rate",
-        subline=((0, 1), (0, 1)),
-        title="ROC curve",
-    )
+    # roc_auc = metric_utils.roc_auc_score(y_test, probs_pred)
+    # fpr, tpr, _ = metric_utils.roc_curve(y_test, probs_pred)
+    # plot_curve(
+    #     fpr,
+    #     tpr,
+    #     name="ROC curve (area = %0.2f)" % roc_auc,
+    #     xlabel="False positive rate",
+    #     ylabel="True positive rate",
+    #     subline=((0, 1), (0, 1)),
+    #     title="ROC curve",
+    # )
 
     print()
     # print(model.average_precision_score(y_test, probs_pred))
