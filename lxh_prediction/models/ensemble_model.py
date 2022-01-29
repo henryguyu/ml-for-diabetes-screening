@@ -10,10 +10,11 @@ from .base_model import BaseModel
 logger = logging.getLogger(__name__)
 
 
-class AutoGluonModel(BaseModel):
+class EnsembleModel(BaseModel):
     LABEL_NAME = "label"
 
-    def __init__(self, params: Dict = {}, metric="roc_auc"):
+    def __init__(self, params: Dict = {}, metric="roc_auc_score"):
+        metric = metric.replace("_score", "")
         self.params = {
             "label": self.LABEL_NAME,
             "eval_metric": metric,
@@ -36,17 +37,17 @@ class AutoGluonModel(BaseModel):
 
         logger.info("Start TabularPredictor.fit...")
         self.model = TabularPredictor(**self.params)
-        self.model.fit(train_data, valid_data)
+        self.model.fit(
+            train_data,
+            valid_data,
+            hyperparameters={"GBM": {}, "RF": {}, "LR": {}, "NN": {}},
+        )
         logger.info("TabularPredictor.fit completed!")
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         assert self.model is not None
-        probs_pred = self.model.predict_proba(X).to_numpy()
+        probs_pred = self.model.predict_proba(X, model="WeightedEnsemble_L2").to_numpy()
         return pd.DataFrame(probs_pred[:, 1], index=X.index, columns=["probs_pred"])
-
-    # def feature_importance(self):
-    #     assert self.model is not None
-    #     return self.model.feature_importance()
 
     def save(self, path):
         with open(path, "wb") as f:

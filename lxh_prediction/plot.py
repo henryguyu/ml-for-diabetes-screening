@@ -42,7 +42,8 @@ class ExpFigure:
     xlim = (0, 1)
     ylim = (0, 1)
 
-    def __init__(self, figure=None, ax=None):
+    def __init__(self, figure=None, ax=None, retrain=True):
+        self.retrain = retrain
         self.fig = figure or plt.figure(figsize=(4, 4), dpi=300)
         self.ax = ax or self.fig.add_subplot(111)
 

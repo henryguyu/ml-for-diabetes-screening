@@ -16,7 +16,7 @@ class auROCNonLab(ExpFigure):
         cv_y_prob = get_cv_preds(
             model_name=model,
             feat_collection=feat_collection,
-            update=True,
+            update=self.retrain,
             resample_train=False,
         )
         fprs, tprs, _ = zip(
@@ -50,7 +50,7 @@ class auPRNonLab(ExpFigure):
         cv_y_prob = get_cv_preds(
             model_name=model,
             feat_collection=feat_collection,
-            update=False,
+            update=self.retrain,
             resample_train=False,
         )
         precisions, recalls, _ = zip(
@@ -83,9 +83,10 @@ class auPRNonLab(ExpFigure):
 
 # %%
 # Figure 1a, ROC, full, top 5/10/15/20
-exp = auROCNonLab()
+exp = auROCNonLab(retrain=False)
 exp.run("Full Model", "LightGBMModel", "full_non_lab")
 exp.run("Top-25 Model", "LightGBMModel", "top25_non_lab")
+exp.run("Top-25 EnsembleModel", "EnsembleModel", "top25_non_lab")
 exp.run("Top-20 Model", "LightGBMModel", "top20_non_lab")
 exp.run("Top-15 Model", "LightGBMModel", "top15_non_lab")
 exp.run("Top-10 Model", "LightGBMModel", "top10_non_lab")
@@ -111,9 +112,10 @@ exp.save("figure1_c")
 # %%
 # Figure 1b, auPR, full, top 5/10/15/20
 
-exp = auPRNonLab()
+exp = auPRNonLab(retrain=False)
 exp.run("Full Model", "LightGBMModel", "full_non_lab")
 exp.run("Top-25 Model", "LightGBMModel", "top25_non_lab")
+exp.run("Top-25 EnsembleModel", "EnsembleModel", "top25_non_lab")
 exp.run("Top-20 Model", "LightGBMModel", "top20_non_lab")
 exp.run("Top-15 Model", "LightGBMModel", "top15_non_lab")
 exp.run("Top-10 Model", "LightGBMModel", "top10_non_lab")
@@ -129,9 +131,10 @@ exp.save("figure1_d")
 
 exp = auROCNonLab()
 # exp.run("Non-lab(AI)", "LightGBMModel", "top20_non_lab")
-exp.run("AI+FPG Model", "AutoGluonModel", "FPG")
-exp.run("AI+2hPG Model", "AutoGluonModel", "2hPG")
-exp.run("AI+HbA1c Model", "AutoGluonModel", "HbA1c")
+exp.run("AI+FPG Model", "EnsembleModel", "FPG")
+exp.run("AI+FPG Model", "LightGBMModel", "FPG")
+# exp.run("AI+2hPG Model", "EnsembleModel", "2hPG")
+# exp.run("AI+HbA1c Model", "EnsembleModel", "HbA1c")
 exp.plot()
 
 # Random
