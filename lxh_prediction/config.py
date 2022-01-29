@@ -16,10 +16,10 @@ ada_fields = "age lsex ldiafamily lghbs ht ASBP ADBP lphysactive BMI".split()
 ch_fields = "age lsex ldiafamily lghbs ht ASBP wc BMI".split()
 
 feature_fields = {
-    "without_FPG": cat_fields + scalar_fields,
-    "with_FPG": cat_fields + scalar_fields + optional_fields,
-    "imp_wo_FPG": important_fields,
-    "imp_with_FPG": important_fields + optional_fields,
+    # "without_FPG": cat_fields + scalar_fields,
+    # "with_FPG": cat_fields + scalar_fields + optional_fields,
+    # "imp_wo_FPG": important_fields,
+    # "imp_with_FPG": important_fields + optional_fields,
     # =======
     "full_non_lab": cat_fields + scalar_fields,
     "top25_non_lab": important_fields[:25],

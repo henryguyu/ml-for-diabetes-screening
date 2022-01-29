@@ -1,4 +1,4 @@
-# %%
+from typing import List
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import SMOTE, SMOTENC
@@ -26,10 +26,10 @@ def onehotify(df: pd.DataFrame, colname, rm_origin=True):
 
 
 def load_data(
-    feature_fields,
-    filename=cfg.data_file,
-    onehot_fields=cfg.onehot_fields,
-    label_field=cfg.label_field,
+    feature_fields: List[str],
+    filename: str = cfg.data_file,
+    onehot_fields: List[str] = cfg.onehot_fields,
+    label_field: str = cfg.label_field,
 ):
     df = read_csv(filename)
     if not feature_fields:
@@ -98,5 +98,3 @@ if __name__ == "__main__":
     sm = SMOTENC(categorical_features=cat_indices, random_state=42)
     X2, y2 = sm.fit_resample(X, y)
 
-
-# %%

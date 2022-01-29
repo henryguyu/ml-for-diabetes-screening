@@ -60,7 +60,3 @@ class ADAModel(BaseModel):
             preds += 100 * (df["HbA1c"] >= 6.5)
 
         return preds
-        # preds = scores.sum(1) >= 5
-        # if "FPG" in df:
-        #     preds = preds | (df["FPG"] >= 7.0)
-        # return preds.astype(int)
