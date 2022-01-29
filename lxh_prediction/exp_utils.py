@@ -1,6 +1,7 @@
 import os
 import pickle
 from typing import List, Tuple
+import pandas as pd
 
 import lxh_prediction.config as cfg
 from lxh_prediction import data_utils, metric_utils, models
@@ -35,7 +36,7 @@ def get_cv_preds(
     cv_aucs, cv_probs_pred, cv_indices = results[key]
 
     cv_ys_gt = [y[idx] for idx in cv_indices]
-    cv_y_prob: List[Tuple[float, float]] = list(zip(cv_ys_gt, cv_probs_pred))
+    cv_y_prob: List[Tuple[pd.Series, pd.Series]] = list(zip(cv_ys_gt, cv_probs_pred))
 
     # identifiable by Tests
     tests = {"FPG": 7, "P2hPG": 11.1, "HbA1c": 6.5}
