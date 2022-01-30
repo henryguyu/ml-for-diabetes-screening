@@ -1,41 +1,27 @@
 library(finalfit)
 
-# Create some extra missing data
-## Smoking missing completely at random
-set.seed(1)
-colon_s$smoking_mcar <-
-    sample(c("Smoker", "Non-smoker", NA),
-        dim(colon_s)[1],
-        replace = TRUE,
-        prob = c(0.2, 0.7, 0.1)
-    ) %>%
-    factor() %>%
-    ff_label("Smoking (MCAR)")
+
+df <- read.csv("/data/lxh/prediction/data/processed_data_0214.csv")
 
 
-## Smoking missing conditional on patient sex
-colon_s$smoking_mar[colon_s$sex.factor == "Female"] <-
-    sample(c("Smoker", "Non-smoker", NA),
-        sum(colon_s$sex.factor == "Female"),
-        replace = TRUE,
-        prob = c(0.1, 0.5, 0.4)
-    )
+df$label <- factor(df$label_WHO) %>% ff_label("Label")
+df$lwork <- factor(df$lwork) %>% ff_label("Work")
+df$tea <- factor(df$tea) %>% ff_label("Tea")
+df$WHR100 <- df$WHR * 100
 
-colon_s$smoking_mar[colon_s$sex.factor == "Male"] <-
-    sample(c("Smoker", "Non-smoker", NA),
-        sum(colon_s$sex.factor == "Male"),
-        replace = TRUE, prob = c(0.15, 0.75, 0.1)
-    )
-colon_s$smoking_mar <- factor(colon_s$smoking_mar) %>%
-    ff_label("Smoking (MAR)")
 
 # Examine with ff_glimpse
 explanatory <- c(
-    "age", "sex.factor",
-    "nodes", "obstruct.factor",
-    "smoking_mcar", "smoking_mar"
+    "Ahr", "age",
+    "WHR100", "ASBP",
+    "lwork", "BMI", "tea"
 )
-dependent <- "mort_5yr"
+dependent <- "label"
 
-colon_s %>%
-    ff_glimpse(dependent, explanatory)
+df %>% ff_glimpse(dependent, explanatory)
+
+#df[explanatory] %>% missing_plot()
+
+#df %>% missing_pattern(dependent, explanatory)
+
+# df %>% finalfit(dependent, explanatory)

@@ -1,8 +1,14 @@
 # %%
 import os
+import sys
 
 import numpy as np
 import pandas as pd
+import sklearn.neighbors._base
+
+# https://stackoverflow.com/questions/60145652/no-module-named-sklearn-neighbors-base
+sys.modules["sklearn.neighbors.base"] = sklearn.neighbors._base  # noqa
+
 from missingpy import MissForest
 from sklearn.ensemble import IsolationForest
 
