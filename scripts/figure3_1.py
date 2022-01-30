@@ -12,8 +12,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 class SensitivityCostExp(ExpFigure):
-    def __init__(self, figure=None, compare_to_all=False):
-        super().__init__(figure=figure)
+    def __init__(self, figure=None, retrain=True, compare_to_all=False):
+        super().__init__(figure=figure, retrain=retrain)
         self.compare_to_all = compare_to_all
 
     @staticmethod
@@ -110,6 +110,18 @@ class SensitivityCostExp(ExpFigure):
             )
             self.add_point(costs, sensitivity)
 
+
+# %%
+exp = SensitivityCostExp(retrain=False)
+exp.xlim = (0, 150)
+exp.ylim = (0, 1)
+
+exp.run("AI+FPG EnsembleModel", "EnsembleModel", "FPG")
+exp.run("AI+FPG Model", "LightGBMModel", "FPG")
+exp.run("AI+FPG Auto", "AutoLightGBMModel", "FPG")
+exp.plot()
+plt.legend(loc="lower right")
+exp.save("figure3_a-2")
 
 #%%
 exp = SensitivityCostExp()

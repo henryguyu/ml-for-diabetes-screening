@@ -10,15 +10,14 @@ from .base_model import BaseModel
 logger = logging.getLogger(__name__)
 
 
-class EnsembleModel(BaseModel):
+class AutoGluonModel(BaseModel):
     LABEL_NAME = "label"
 
     def __init__(
         self,
         params: Dict = {},
         metric="roc_auc_score",
-        train_models=("GBM", "RF", "LR", "NN"),
-        predict_model="WeightedEnsemble_L2",
+        predict_model=None,
         fit_params: Dict = None,
         tune_on_valid=True,
     ):
@@ -30,7 +29,6 @@ class EnsembleModel(BaseModel):
         }
         self.params.update(params)
         self.model = None
-        self.train_models = train_models
         self.predict_model = predict_model
         self.fit_params = fit_params or {}
         self.tune_on_valid = tune_on_valid
@@ -51,12 +49,7 @@ class EnsembleModel(BaseModel):
 
         logger.info("Start TabularPredictor.fit...")
         self.model = TabularPredictor(**self.params)
-        self.model.fit(
-            train_data,
-            valid_data,
-            hyperparameters={name: {} for name in self.train_models},
-            **self.fit_params
-        )
+        self.model.fit(train_data, valid_data, **self.fit_params)
         logger.info("TabularPredictor.fit completed!")
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -75,13 +68,31 @@ class EnsembleModel(BaseModel):
         self.params = data["params"]
 
 
-class AutoLightGBMModel(EnsembleModel):
+class EnsembleModel(AutoGluonModel):
+    def __init__(self, params: Dict = {}, metric="roc_auc_score"):
+        super().__init__(
+            params=params,
+            metric=metric,
+            predict_model="WeightedEnsemble_L2",
+            fit_params={"hyperparameters": {"GBM": {}, "RF": {}, "LR": {}, "NN": {}}},
+            tune_on_valid=True,
+        )
+
+
+class AutoLightGBMModel(AutoGluonModel):
     def __init__(self, params: Dict = {}, metric="roc_auc_score"):
         super().__init__(
             params,
             metric,
-            train_models=["GBM"],
-            predict_model=None,
-            fit_params={"presets": "best_quality"},
+            predict_model="LightGBMXT_BAG_L2",
+            fit_params={
+                "presets": "best_quality",
+                "hyperparameters": {
+                    "GBM": [
+                        {"extra_trees": True, "ag_args": {"name_suffix": "XT"}},
+                        # {},
+                    ]
+                },
+            },
             tune_on_valid=False,
         )
