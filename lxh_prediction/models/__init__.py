@@ -7,7 +7,7 @@ from .lr_model import LogisticRegressionModel
 from .pca_model import PCAModel
 from .svm_model import SVMModel
 from .random_forest_model import RandomForestModel
-from .ensemble_model import EnsembleModel
+from .ensemble_model import EnsembleModel, AutoLightGBMModel
 
 __all__ = [
     "BaseModel",
@@ -20,4 +20,5 @@ __all__ = [
     "ADAModel",
     "CHModel",
     "EnsembleModel",
+    "AutoLightGBMModel",
 ]
