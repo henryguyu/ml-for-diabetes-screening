@@ -159,3 +159,11 @@ df["label_ADA"] = (
 # Save
 df.to_csv(dst_file, index=False)
 # %%
+miss_rates = df_feat.isna().mean(0)
+miss_rates.drop("weich", inplace=True)
+miss_rates.sort_values(ascending=False, inplace=True)
+important_fields = "Ahr age WHR ASBP lwork BMI wc culutrue lusephy WHtR ADBP lgetup hc seattime lvigday lvighour ldrinking frye0 ntime nigtime hypertension tea lseat1hou lgest lseat2hou".split()
+top_20 = [(name, miss_rates[name]) for name in important_fields[:20]]
+print(top_20)
+
+# %%
