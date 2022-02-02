@@ -37,3 +37,12 @@ python setup.py develop
 
 ### Run experiments
 Run script in `scripts/` to generate the corresponding results.
+
+## Reference
+1. LightGBM: https://lightgbm.readthedocs.io
+2. PyTorch (ANN model): http://pytorch.org
+3. scikit-learn (LR, RF, SVM models): https://scikit-learn.org
+4. SHAP (model explanation): https://github.com/slundberg/shap
+5. NNI (parameter tuning): https://github.com/microsoft/nni
+6. Autogluon (ensemble model & auto parameter tuning): https://auto.gluon.ai
+7. Delong test: https://github.com/yandexdataschool/roc_comparison
