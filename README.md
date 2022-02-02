@@ -36,7 +36,8 @@ python setup.py develop
 ```
 
 ### Run experiments
-Run script in `scripts/` to generate the corresponding results.
+1. Prepare your data in `csv` format and update the feature collections in `lxh_prediction/config.py`.
+2. Run script in `scripts/` to generate the corresponding results.
 
 ## Reference
 1. LightGBM: https://lightgbm.readthedocs.io
