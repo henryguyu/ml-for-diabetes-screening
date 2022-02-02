@@ -84,11 +84,12 @@ class auPRNonLab(ExpFigure):
 # %%
 # Figure 1a, ROC, full, top 5/10/15/20
 exp = auROCNonLab(retrain=True)
-# exp.run("Full Model", "LightGBMModel", "full_non_lab")
-exp.run("Top-25 Model", "LightGBMModel", "top25_non_lab")
-exp.run("Top-20 EnsembleModel", "EnsembleModel", "top20_non_lab")
+exp.run("Full Model", "LightGBMModel", "full_non_lab")
+exp.run("Full Model Auto", "AutoLightGBMModel", "full_non_lab")
+# exp.run("Top-25 Model", "LightGBMModel", "top25_non_lab")
+# exp.run("Top-20 EnsembleModel", "EnsembleModel", "top20_non_lab")
 # exp.run("Top-20 Model Auto", "AutoLightGBMModel", "top20_non_lab")
-exp.run("Top-20 Model", "LightGBMModel", "top20_non_lab")
+# exp.run("Top-20 Model", "LightGBMModel", "top20_non_lab")
 # exp.run("Top-15 Model", "LightGBMModel", "top15_non_lab")
 # exp.run("Top-10 Model", "LightGBMModel", "top10_non_lab")
 # exp.run("Top-5 Model", "LightGBMModel", "top5_non_lab")

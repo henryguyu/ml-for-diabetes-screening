@@ -84,7 +84,7 @@ class AutoLightGBMModel(AutoGluonModel):
         super().__init__(
             params,
             metric,
-            predict_model="LightGBMXT_BAG_L2",
+            predict_model="LightGBMXT_BAG_L1",
             fit_params={
                 "presets": "best_quality",
                 "hyperparameters": {

@@ -9,10 +9,10 @@ import sklearn.neighbors._base
 # https://stackoverflow.com/questions/60145652/no-module-named-sklearn-neighbors-base
 sys.modules["sklearn.neighbors.base"] = sklearn.neighbors._base  # noqa
 
-from missingpy import MissForest
-from sklearn.ensemble import IsolationForest
+from missingpy import MissForest  # noqa
+from sklearn.ensemble import IsolationForest  # noqa
 
-from lxh_prediction import config as cfg
+from lxh_prediction import config as cfg  # noqa
 
 # %%
 src_file = os.path.join(cfg.root, "data/missforest.2.csv")

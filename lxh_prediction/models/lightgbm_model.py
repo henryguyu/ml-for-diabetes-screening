@@ -37,6 +37,7 @@ class LightGBMModel(BaseModel):
             "bagging_fraction": 0.9,
             "bagging_freq": 4,
             "path_smooth": 0.1,
+            "verbose": -1,
         }
         self.params.update(params)
         self.model = None
@@ -55,7 +56,7 @@ class LightGBMModel(BaseModel):
 
         logger.info("Start lgb.train...")
         self.model = lgb.train(
-            self.params, train_data, valid_sets=valid_sets, verbose_eval=10
+            self.params, train_data, valid_sets=valid_sets, verbose_eval=False
         )
         logger.info("lgb.train completed!")
 
