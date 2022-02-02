@@ -4,3 +4,6 @@ scipy
 numpy
 lightgbm==3.1.0
 shap
+autogluon
+missingpy
+matplotlib
