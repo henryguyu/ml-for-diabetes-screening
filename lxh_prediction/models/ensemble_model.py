@@ -96,3 +96,22 @@ class AutoLightGBMModel(AutoGluonModel):
             },
             tune_on_valid=False,
         )
+
+
+class AutoLightGBMModel2(AutoGluonModel):
+    def __init__(self, params: Dict = {}, metric="roc_auc_score"):
+        super().__init__(
+            params,
+            metric,
+            predict_model="LightGBMXT_BAG_L2",
+            fit_params={
+                "presets": "best_quality",
+                "hyperparameters": {
+                    "GBM": [
+                        {"extra_trees": True, "ag_args": {"name_suffix": "XT"}},
+                        # {},
+                    ]
+                },
+            },
+            tune_on_valid=False,
+        )
