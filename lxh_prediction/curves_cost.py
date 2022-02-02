@@ -118,7 +118,7 @@ class CostMissRateExp(ExpFigure):
             color=color,
             zorder=3,
             xlabel="Sensitivity",
-            ylabel="Average screening Costs",
+            ylabel="Average detection Costs",
         )
         plot_range(x_base, y_lower, y_upper, zorder=2)
         self.y_means[name] = y_mean
@@ -215,7 +215,7 @@ class SensitivityCostExp(ExpFigure):
             name=f"{name}",
             color=color,
             zorder=3,
-            xlabel="Average screening Costs",
+            xlabel="Average detection Costs",
             ylabel="Sensitivity",
         )
         plot_range(x_base, y_lower, y_upper, zorder=2)
@@ -303,7 +303,7 @@ class FutureCostExp(ExpFigure):
             name=f"{name}",
             color=color,
             zorder=3,
-            xlabel="Average screening Costs",
+            xlabel="Average detection Costs",
             ylabel="Average costs of potential complications",
         )
 
@@ -322,7 +322,7 @@ class FutureCostExp(ExpFigure):
             name=None,
             color=color,
             zorder=3,
-            xlabel="Average screening Costs",
+            xlabel="Average detection Costs",
             ylabel="Average costs of potential complications",
         )
 
