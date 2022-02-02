@@ -110,7 +110,11 @@ class ExpFigure:
         os.makedirs(os.path.dirname(output), exist_ok=True)
         df_xmeans.to_csv(output)
 
-        self.fig.savefig(os.path.join(cfg.root, f"data/results/{name}.png"), dpi=300)
+        self.fig.savefig(
+            os.path.join(cfg.root, f"data/results/{name}.png"),
+            dpi=300,
+            bbox_inches="tight",
+        )
 
     def fname(self, name):
         # name = f"{name} Model" if "+" not in name else name
